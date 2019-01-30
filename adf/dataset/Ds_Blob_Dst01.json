@@ -1,0 +1,16 @@
+{
+	"name": "Ds_Blob_Dst01",
+	"properties": {
+		"description": "Connection to your destination Azure Blob Store.",
+		"linkedServiceName": {
+			"referenceName": "Ls_Blob",
+			"type": "LinkedServiceReference"
+		},
+		"type": "AzureBlob",
+		"typeProperties": {
+			"fileName": "",
+			"folderPath": "sinkdata/staged_sink"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

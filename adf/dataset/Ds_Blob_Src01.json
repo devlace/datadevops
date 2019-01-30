@@ -1,0 +1,16 @@
+{
+	"name": "Ds_Blob_Src01",
+	"properties": {
+		"description": "Connection to your source files in Azure Blob Store.",
+		"linkedServiceName": {
+			"referenceName": "Ls_Blob",
+			"type": "LinkedServiceReference"
+		},
+		"type": "AzureBlob",
+		"typeProperties": {
+			"fileName": "Product.csv",
+			"folderPath": "data/source"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
