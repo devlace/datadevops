@@ -8,8 +8,11 @@
 		},
 		"type": "AzureBlob",
 		"typeProperties": {
-			"fileName": "",
-			"folderPath": "sinkdata/staged_sink"
+			"fileName": {
+				"value": "@concat('MelbParkingData_', utcnow())",
+				"type": "Expression"
+			},
+			"folderPath": "lnd"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
