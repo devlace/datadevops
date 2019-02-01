@@ -13,7 +13,7 @@
 				"filePattern": "arrayOfObjects"
 			},
 			"fileName": {
-				"value": "@concat('MelbParkingData_', utcnow(), '.csv')",
+				"value": "@concat('MelbParkingData_', utcnow('YYYY_MM_dd_HH_mm_ss'), '.json')",
 				"type": "Expression"
 			},
 			"folderPath": "lnd"
