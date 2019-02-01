@@ -1,0 +1,143 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory Name",
+			"defaultValue": "lacecicddf"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/P_MelbParkingData')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Download Melb Parking Data",
+						"type": "Copy",
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010"
+							},
+							"sink": {
+								"type": "BlobSink"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"schemaMapping": {
+									"[[':@computed_region_evbi_jbp8']": "[concat('[', ''':@computed_region_evbi_jbp8'']')]",
+									"bay_id": "bay_id",
+									"lat": "lat",
+									"location.type": "location.type",
+									"lon": "lon",
+									"st_marker_id": "st_marker_id",
+									"status": "status"
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Ds_MelbParkingData",
+								"type": "DatasetReference"
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Ds_Blob_Dst01",
+								"type": "DatasetReference"
+							}
+						]
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Ds_MelbParkingData')]",
+				"[concat(variables('factoryId'), '/datasets/Ds_Blob_Dst01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ds_Blob_Dst01')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to your destination Azure Blob Store.",
+				"linkedServiceName": {
+					"referenceName": "Ls_Blob",
+					"type": "LinkedServiceReference"
+				},
+				"type": "AzureBlob",
+				"typeProperties": {
+					"format": {
+						"type": "JsonFormat",
+						"filePattern": "arrayOfObjects"
+					},
+					"fileName": {
+						"value": "@concat('MelbParkingData_', utcnow('YYYY_MM_dd_HH_mm_ss'), '.json')",
+						"type": "Expression"
+					},
+					"folderPath": "lnd"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ds_MelbParkingData')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ls_Rest_MelParkSensors",
+					"type": "LinkedServiceReference"
+				},
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": "dtpv-d4pf.json",
+					"requestMethod": "GET"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/T_Sched_5min')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "P_MelbParkingData",
+							"type": "PipelineReference"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 5,
+						"startTime": "2019-02-01T05:28:00.000Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/P_MelbParkingData')]"
+			]
+		}
+	]
+}
