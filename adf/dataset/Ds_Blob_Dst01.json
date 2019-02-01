@@ -8,8 +8,12 @@
 		},
 		"type": "AzureBlob",
 		"typeProperties": {
+			"format": {
+				"type": "JsonFormat",
+				"filePattern": "arrayOfObjects"
+			},
 			"fileName": {
-				"value": "@concat('MelbParkingData_', utcnow())",
+				"value": "@concat('MelbParkingData_', utcnow(), '.csv')",
 				"type": "Expression"
 			},
 			"folderPath": "lnd"
