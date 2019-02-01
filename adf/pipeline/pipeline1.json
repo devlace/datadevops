@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy Data1",
+				"name": "Download Melb Parking Data",
 				"type": "Copy",
 				"policy": {
 					"timeout": "7.00:00:00",
