@@ -1,5 +1,5 @@
 {
-	"name": "pipeline1",
+	"name": "P_MelbParkingData",
 	"properties": {
 		"activities": [
 			{
@@ -19,8 +19,7 @@
 						"requestInterval": "00.00:00:00.010"
 					},
 					"sink": {
-						"type": "BlobSink",
-						"copyBehavior": "FlattenHierarchy"
+						"type": "BlobSink"
 					},
 					"enableStaging": false,
 					"translator": {
