@@ -1,0 +1,53 @@
+{
+	"name": "P_Ingest_MelbParkingData",
+	"properties": {
+		"activities": [
+			{
+				"name": "Download Melb Parking Data",
+				"type": "Copy",
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010"
+					},
+					"sink": {
+						"type": "BlobSink"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"schemaMapping": {
+							"[':@computed_region_evbi_jbp8']": "[':@computed_region_evbi_jbp8']",
+							"bay_id": "bay_id",
+							"lat": "lat",
+							"location.type": "location.type",
+							"lon": "lon",
+							"st_marker_id": "st_marker_id",
+							"status": "status"
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Ds_MelbParkingData",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Ds_Blob_Dst01",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		]
+	}
+}
