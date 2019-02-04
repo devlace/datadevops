@@ -1,0 +1,166 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "deployNs": {
+            "defaultValue": "ddo",
+            "type": "string"
+        },
+        "env": {
+            "defaultValue": "dev",
+            "type": "string",
+            "allowedValues": [
+                "dev",
+                "stg",
+                "prod"
+            ]
+        },
+        "dbricksName": {
+            "defaultValue": "[concat(parameters('deployNs'), 'dbricks', uniqueString(resourceGroup().id))]",
+            "type": "String"
+        },
+        "kvName": {
+            "defaultValue": "[concat(parameters('deployNs'), 'kv', uniqueString(resourceGroup().id))]",
+            "type": "String",
+            "metadata": {
+                "description": "Key Vault Name"
+            }
+        },
+        "kvOwnerObjectId": {
+            "type": "String",
+            "metadata": {
+                "description": "Active Directory ObjectId to be granted full rights to KV"
+            }
+        },
+        "storName": {
+            "defaultValue": "[concat(parameters('deployNs'), 'stor', uniqueString(resourceGroup().id))]",
+            "type": "String",
+            "metadata": {
+                "description": "Storage account - ADLA Gen2"
+            }
+        },
+        "spStorName": {
+            "defaultValue": "[concat(parameters('deployNs'), 'sp', uniqueString(resourceGroup().id))]",
+            "type": "String",
+            "metadata": {
+                "description": "Service Principal to be granted access to Storage Account - ADLA Gen2"
+            }
+        }
+    },
+    "variables": {
+        "managedResourceGroupId": "[concat(subscription().id, '/resourceGroups/', variables('managedResourceGroupName'))]",
+        "managedResourceGroupName": "[concat('databricks-rg-', parameters('dbricksName'), '-', uniqueString(parameters('dbricksName'), resourceGroup().id))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2018-04-01",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('dbricksName')]",
+            "tags": {
+                "displayName": "Databricks Workspace",
+                "Environment": "[parameters('env')]"
+            },
+            "sku": {
+                "name": "premium"
+            },
+            "properties": {
+                "ManagedResourceGroupId": "[variables('managedResourceGroupId')]"
+            },
+            "type": "Microsoft.Databricks/workspaces"
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "[parameters('kvName')]",
+            "apiVersion": "2015-06-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "Key Vault",
+                "Environment": "[parameters('env')]"
+            },
+            "properties": {
+                "enabledForDeployment": false,
+                "enabledForTemplateDeployment": true,
+                "enabledForVolumeEncryption": false,
+                "tenantId": "[subscription().tenantId]",
+                "accessPolicies": [{
+                    "tenantId": "[subscription().tenantId]",
+                    "objectId": "[parameters('kvOwnerObjectId')]",
+                    "permissions": {
+                        "keys": [
+                            "All"
+                        ],
+                        "secrets": [
+                            "All"
+                        ]
+                    }
+                }],
+                "sku": {
+                    "family": "A",
+                    "name": "Standard"
+                }
+            }
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/c20af4c3-6b7a-4ee8-b830-a2a69c4a56ac/resourceGroups/lacedbcicd/providers/Microsoft.Storage/storageAccounts/lacecicdstor02'.",
+            "type": "Microsoft.Storage/storageAccounts",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "name": "[parameters('storName')]",
+            "apiVersion": "2018-07-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "Data Lake",
+                "Environment": "[parameters('env')]"
+            },
+            "scale": null,
+            "properties": {
+                "isHnsEnabled": true,
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "enabled": true
+                        },
+                        "blob": {
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            },
+            "dependsOn": []
+        }
+    ],
+    "outputs": {
+        "dbricksName": {
+            "value": "[parameters('dbricksName')]",
+            "type": "string"
+        },
+        "dbricksLocation": {
+            "value": "[resourceGroup().location]",
+            "type": "string"
+        },
+        "kvName": {
+            "value": "[parameters('kvName')]",
+            "type": "string"
+        },
+        "storName": {
+            "value": "[parameters('storName')]",
+            "type": "string"
+        },
+        "spStorName": {
+            "value": "[parameters('spStorName')]",
+            "type": "string"
+        }
+    }
+}
