@@ -1,5 +1,5 @@
 {
-    "cluster_name": "ddo_cluster",
+    "cluster_name": "__REPLACE_CLUSTER_NAME__",
     "autoscale": { "min_workers": 2, "max_workers": 3 },
     "spark_version": "5.1.x-scala2.11",
     "autotermination_minutes": 120,
@@ -7,8 +7,8 @@
     "driver_node_type_id": "Standard_DS13_v2",
     "spark_env_vars": {
         "PYSPARK_PYTHON": "/databricks/python3/bin/python3",
-        "MOUNT_DATA_PATH": "/mnt/datalake",
-        "MOUNT_DATA_CONTAINER": "datalake",
-        "DATABASE": "datalake"
+        "MOUNT_DATA_PATH": "__REPLACE_MOUNT_DATA_PATH__",
+        "MOUNT_DATA_CONTAINER": "__REPLACE_MOUNT_DATA_CONTAINER__",
+        "DATABASE": "__REPLACE_DATABASE__"
     }
 }

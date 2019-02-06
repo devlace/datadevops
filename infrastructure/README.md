@@ -5,5 +5,5 @@ All parameters are set in azure.deploy.parameters.<ENV>.json files
 ## Scripts
 
 deploy_all.sh
-└── _deploy_resources.sh        <- deploys resources to a specific Environment
-    └──_configure_adlagen2.sh   <- configures the newly deployed ADLA Gen2
+└── deploy_infrastructure.sh        <- deploys resources to a specific Environment
+    └── configure_adlagen2.sh   <- configures the newly deployed ADLA Gen2

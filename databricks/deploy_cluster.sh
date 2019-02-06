@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # Access granted under MIT Open Source License: https://en.wikipedia.org/wiki/MIT_License
@@ -22,38 +23,36 @@ set -o pipefail
 set -o nounset
 # set -o xtrace # For debugging
 
-env_name="${1-}"
-rg_name="${2-}"
-rg_location="${3-}"
-sub_id="${4-}"
+# Set path
+dir_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+cd "$dir_path"
 
-#####################
-# Deploy ARM template
 
-# Set account to where ARM template will be deployed to
-echo "Deploying to Subscription: $sub_id"
-az account set --subscription $sub_id
+###################
+# USER PARAMETERS
+release_id="${1-}"
+cluster_name="${2-}"
+mount_data_path="${3-}"
+mount_data_container="${4-}"
+database=${5-}
 
-# Retrieve KeyVault User Id
-upn=$(az account show --output json | jq -r '.user.name')
-kvOwnerObjectId=$(az ad user show --upn $upn \
-    --output json | jq -r '.objectId')
 
-# Create resource group
-echo "Creating resource group: $rg_name"
-az group create --name "$rg_name" --location "$rg_location"
+# Deploy clusters
+full_cluster_name=${cluster_name}_${release_id}
+cluster_config=$(cat ./config/cluster.config.template.json |
+    sed "s/__REPLACE_CLUSTER_NAME__/$full_cluster_name/g" |
+    sed "s/__REPLACE_MOUNT_DATA_PATH__/$mount_data_path/g" |
+    sed "s/__REPLACE_MOUNT_DATA_CONTAINER__/$mount_data_container/g" |
+    sed "s/__REPLACE_DATABASE__/$database/g")
+databricks clusters create --json "$cluster_config"
 
-# Deploy arm template
-echo "Deploying resources into $rg_name"
-arm_output=$(az group deployment create \
-    --name "$deploy_name" \
-    --resource-group "$rg_name" \
-    --template-file "./azuredeploy.json" \
-    --parameters @"./azuredeploy.parameters.${env_name}.json" \
-    --parameters "kvOwnerObjectId=${kvOwnerObjectId}" \
-    --output json)
+# Upload dependencies
+echo "Uploading libraries dependencies..."
+databricks fs cp ./libs/ "dbfs:${mount_data_path}/libs/$release_id" --recursive --overwrite
 
-if [[ -z $arm_output ]]; then
-    echo >&2 "ARM deployment failed." 
-    exit 1
-fi
+# Install Library dependencies
+echo "Installing 3rd party library depedencies..."
+cluster_id=$(databricks clusters list | awk '/'$full_cluster_name'/ {print $1}')
+databricks libraries install \
+    --jar "dbfs:${mount_data_path}/libs/azure-cosmosdb-spark_2.3.0_2.11-1.2.2-uber.jar" \
+    --cluster-id $cluster_id

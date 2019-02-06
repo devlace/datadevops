@@ -16,20 +16,36 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 # DEALINGS IN THE SOFTWARE.
 
+
 set -o errexit
 set -o pipefail
 set -o nounset
-# set -o xtrace
+# set -o xtrace # For debugging
 
 # Set path
-parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-cd "$parent_path"
+dir_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+cd "$dir_path"
 
 # Constants
 RED='\033[0;31m'
 ORANGE='\033[0;33m'
 NC='\033[0m'
-cluster_config="./config/cluster.config.json"
+
+CLUSTER_CONFIG="./config/cluster.config.json"
+MOUNT_DATA_PATH="/mnt/datalake"
+
+###################
+# USER PARAMETERS
+env_name="${1-}"
+
+# Import correct .env file
+set -o allexport
+env_file="../.env.$env_name"
+if [[ -e $env_file ]]
+then
+    source $env_file
+fi
+set +o allexport
 
 
 wait_for_run () {
@@ -66,7 +82,7 @@ cluster_exists () {
 _main() {
     # Upload notebooks
     echo "Uploading notebooks..."
-    databricks workspace import_dir "databricks/notebooks" "/notebooks" --overwrite
+    databricks workspace import_dir "notebooks" "/notebooks" --overwrite
 
     # Setup workspace
     echo "Setting up workspace and tables. This may take a while as cluster spins up..."
@@ -74,12 +90,12 @@ _main() {
 
     # Create initial cluster, if not yet exists
     echo "Creating an interactive cluster..."
-    cluster_name=$(cat $cluster_config | jq -r ".cluster_name")
+    cluster_name=$(cat $CLUSTER_CONFIG | jq -r ".cluster_name")
     if cluster_exists $cluster_name; then 
         echo "Cluster ${cluster_name} already exists!"
     else
         echo "Creating cluster ${cluster_name}..."
-        databricks clusters create --json-file $cluster_config
+        databricks clusters create --json-file $CLUSTER_CONFIG
     fi
 
     # Upload dependencies

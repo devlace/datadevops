@@ -1,8 +1,6 @@
 # DataDevOps
 
-## Background
-
-The following solution was based on a number of two recent customer engagements with CSE.
+*This repository is currently a work in progress.*
 
 ## Architecture
 
@@ -19,6 +17,7 @@ The following solution was based on a number of two recent customer engagements 
 - Prod
 
 - Tagging appropriate resources
+- All sensitive configuration information is stored in KeyVault. 
 
 ## Deploy
 

@@ -39,7 +39,7 @@ rg_location="${3-}"
 sub_id="${4-}"
 kvOwnerObjectId="${5-}"
 
-env_file=".env.${env_name}"
+env_file="../.env.${env_name}"
 deploy_name="test"
 #####################
 # DEPLOY ARM TEMPLATE
@@ -69,18 +69,18 @@ fi
 ###########################
 # RETRIEVE DATABRICKS INFORMATION
 
-# Ask user to configure databricks cli
-# TODO: see if this can be automated
-dbricks_name=$(echo $arm_output | jq -r '.properties.outputs.dbricksName.value')
-echo -e "${ORANGE}"
-echo "Configure your databricks cli to connect to the newly created Databricks workspace: ${dbricks_name}. See here for more info: https://bit.ly/2GUwHcw."
-databricks configure --token
-echo -e "${NC}"
+# # Ask user to configure databricks cli
+# # TODO: see if this can be automated
+# dbricks_name=$(echo $arm_output | jq -r '.properties.outputs.dbricksName.value')
+# echo -e "${ORANGE}"
+# echo "Configure your databricks cli to connect to the newly created Databricks workspace: ${dbricks_name}. See here for more info: https://bit.ly/2GUwHcw."
+# databricks configure --token
+# echo -e "${NC}"
 
-# Databricks token and details
-dbricks_location=$(echo $arm_output | jq -r '.properties.outputs.dbricksLocation.value')
-dbi_token=$(awk '/token/ && NR==3 {print $0;exit;}' ~/.databrickscfg | cut -d' ' -f3)
-[[ -n $dbi_token ]] || { echo >&2 "Databricks cli not configured correctly. Please run databricks configure --token. Aborting."; exit 1; }
+# # Databricks token and details
+# dbricks_location=$(echo $arm_output | jq -r '.properties.outputs.dbricksLocation.value')
+# dbi_token=$(awk '/token/ && NR==3 {print $0;exit;}' ~/.databrickscfg | cut -d' ' -f3)
+# [[ -n $dbi_token ]] || { echo >&2 "Databricks cli not configured correctly. Please run databricks configure --token. Aborting."; exit 1; }
 
 
 #########################
@@ -96,7 +96,6 @@ storage_account_key=$(az storage account keys list \
     --resource-group $rg_name \
     --output json |
     jq -r '.[0].value')
-
 
 # Retrieve SP name for ADLA Gen2 from arm output
 sp_stor_name=$(echo $arm_output | jq -r '.properties.outputs.spStorName.value')
@@ -115,19 +114,20 @@ sp_stor_tenantid=$(echo $sp_stor_out | jq -r '.tenant')
 
 # Configure ADLA GEN2
 sleep 15s # See this issue: https://github.com/Azure/azure-powershell/issues/2286
-. ./_configure_adlagen2.sh "$rg_name" "$storage_account" "$sp_stor_id" "$sp_stor_pass" "$sp_stor_tenantid"
+. ./configure_adlagen2.sh "$rg_name" "$storage_account" "$sp_stor_id" "$sp_stor_pass" "$sp_stor_tenantid"
 
 
 ####################
 # SAVE RELEVANT SECRETS IN KEYVAULT
 
-az keyvault secret set --vault-name $kv_name --name "BLOB_STORAGE_ACCOUNT" --value $storage_account
-az keyvault secret set --vault-name $kv_name --name "BLOB_STORAGE_KEY" --value $storage_account_key
-az keyvault secret set --vault-name $kv_name --name "SP_STOR_NAME" --value $sp_stor_name
-az keyvault secret set --vault-name $kv_name --name "SP_STOR_ID" --value $sp_stor_id
-az keyvault secret set --vault-name $kv_name --name "SP_STOR_PASS" --value $sp_stor_pass
-az keyvault secret set --vault-name $kv_name --name "SP_STOR_TENANT" --value $sp_stor_tenantid
-az keyvault secret set --vault-name $kv_name --name "DBRICKS_TOKEN" --value $dbi_token
+az keyvault secret set --vault-name $kv_name --name "storageAccount" --value $storage_account
+az keyvault secret set --vault-name $kv_name --name "storageKey" --value $storage_account_key
+az keyvault secret set --vault-name $kv_name --name "spStorName" --value $sp_stor_name
+az keyvault secret set --vault-name $kv_name --name "spStorId" --value $sp_stor_id
+az keyvault secret set --vault-name $kv_name --name "spStorPass" --value $sp_stor_pass
+az keyvault secret set --vault-name $kv_name --name "spStorTenantId" --value $sp_stor_tenantid
+# az keyvault secret set --vault-name $kv_name --name "dbricksDomain" --value ${dbricks_location}.azuredatabricks.net
+# az keyvault secret set --vault-name $kv_name --name "dbricksToken" --value $dbi_token
 
 
 ####################
@@ -144,9 +144,10 @@ SP_STOR_ID=${sp_stor_id}
 SP_STOR_PASS=${sp_stor_pass}
 SP_STOR_TENANT=${sp_stor_tenantid}
 KV_NAME=${kv_name}
-DBRICKS_DOMAIN=${dbricks_location}.azuredatabricks.net
-DBRICKS_TOKEN=${dbi_token}
+DATABRICKS_HOST=<FILL_ME>
+DATABRICKS_TOKEN=<FILL_ME>
 
 EOF
+
 
 echo "Completed deploying Azure resources $rg_name ($env_name)"

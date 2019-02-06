@@ -2,10 +2,13 @@
     "run_name": "Setup workspace",
     "new_cluster": {
         "spark_version": "5.1.x-scala2.11",
-        "node_type_id": "Standard_DS13_v2",
+        "node_type_id": "Standard_DS12_v2",
         "num_workers": 1,
         "spark_env_vars": {
-            "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3",
+            "MOUNT_DATA_PATH": "/mnt/datalake",
+            "MOUNT_DATA_CONTAINER": "datalake",
+            "DATABASE": "datalake"
         }
     },
     "libraries": [],

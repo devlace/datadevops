@@ -26,16 +26,22 @@ set -o nounset
 dir_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 cd "$dir_path"
 
-# Import .env file, if exists
-set -o allexport
-if [[ -e ../.env ]]
-then
-    source ../.env
-fi
-set +o allexport
-
 # Set constants
 scope_name="storage_scope" # fixed
+
+
+###################
+# USER PARAMETERS
+env_name="${1-}"
+
+# Import correct .env file
+set -o allexport
+env_file="../.env.$env_name"
+if [[ -e $env_file ]]
+then
+    source $env_file
+fi
+set +o allexport
 
 # Create scope, if not exists
 if [[ -z $(databricks secrets list-scopes | grep "$scope_name") ]]; then
