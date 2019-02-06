@@ -16,11 +16,11 @@
             ]
         },
         "dbricksName": {
-            "defaultValue": "[concat(parameters('deployNs'), 'dbricks', uniqueString(resourceGroup().id))]",
+            "defaultValue": "[concat(parameters('deployNs'), 'dbricks', parameters('env'))]",
             "type": "String"
         },
         "kvName": {
-            "defaultValue": "[concat(parameters('deployNs'), 'kv', uniqueString(resourceGroup().id))]",
+            "defaultValue": "[concat(parameters('deployNs'), 'kv', parameters('env'), substring(uniqueString(resourceGroup().id), 0, 8))]",
             "type": "String",
             "metadata": {
                 "description": "Key Vault Name"
@@ -33,14 +33,14 @@
             }
         },
         "storName": {
-            "defaultValue": "[concat(parameters('deployNs'), 'stor', uniqueString(resourceGroup().id))]",
+            "defaultValue": "[concat(parameters('deployNs'), 'stor', parameters('env'), substring(uniqueString(resourceGroup().id), 0, 8))]",
             "type": "String",
             "metadata": {
                 "description": "Storage account - ADLA Gen2"
             }
         },
         "spStorName": {
-            "defaultValue": "[concat(parameters('deployNs'), 'sp', uniqueString(resourceGroup().id))]",
+            "defaultValue": "[concat(parameters('deployNs'), 'sp', parameters('env'), substring(uniqueString(resourceGroup().id), 0, 8))]",
             "type": "String",
             "metadata": {
                 "description": "Service Principal to be granted access to Storage Account - ADLA Gen2"

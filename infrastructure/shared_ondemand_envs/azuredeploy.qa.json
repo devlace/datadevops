@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "deployNs": {
+            "defaultValue": "ddo",
+            "type": "string"
+        },
+        "env": {
+            "defaultValue": "qa",
+            "type": "string"
+        },
+        "kvName": {
+            "defaultValue": "[concat(parameters('deployNs'), 'kv', uniqueString(resourceGroup().id))]",
+            "type": "String",
+            "metadata": {
+                "description": "Key Vault Name"
+            }
+        },
+        "kvOwnerObjectId": {
+            "type": "String",
+            "metadata": {
+                "description": "Active Directory ObjectId to be granted full rights to KV"
+            }
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "[parameters('kvName')]",
+            "apiVersion": "2015-06-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "Key Vault",
+                "Environment": "[parameters('env')]"
+            },
+            "properties": {
+                "enabledForDeployment": false,
+                "enabledForTemplateDeployment": true,
+                "enabledForVolumeEncryption": false,
+                "tenantId": "[subscription().tenantId]",
+                "accessPolicies": [{
+                    "tenantId": "[subscription().tenantId]",
+                    "objectId": "[parameters('kvOwnerObjectId')]",
+                    "permissions": {
+                        "keys": [
+                            "All"
+                        ],
+                        "secrets": [
+                            "All"
+                        ]
+                    }
+                }],
+                "sku": {
+                    "family": "A",
+                    "name": "Standard"
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "kvName": {
+            "value": "[parameters('kvName')]",
+            "type": "string"
+        }
+    }
+}
