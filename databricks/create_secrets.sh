@@ -27,7 +27,15 @@ dir_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 cd "$dir_path"
 
 # Set constants
-scope_name="storage_scope" # fixed
+scope_name="storage_scope" # fixed # TODO pass via arm template
+
+###################
+# Requires the following to be set:
+#
+# BLOB_STORAGE_ACCOUNT=
+# SP_STOR_ID=
+# SP_STOR_PASS=
+# SP_STOR_TENANT=
 
 
 ###################
