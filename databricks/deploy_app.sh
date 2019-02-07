@@ -62,7 +62,7 @@ echo "Uploading libraries dependencies to DBFS..."
 databricks fs cp ./libs/ "${dbfs_libs_path}" --recursive
 
 echo "Uploading app libraries to DBFS..."
-databricks fs cp $WHEEL_FILE_PATH "dbfs:${MOUNT_DATA_PATH}/libs/$release_${RELEASE_ID}"
+databricks fs cp $WHEEL_FILE_PATH "${dbfs_libs_path}"
 
 # Install Library dependencies
 echo "Installing 3rd party library depedencies into cluster..."
