@@ -13,7 +13,7 @@ The following shows the overall architecture of the solution.
 ### Design Principles
 
 - **Data Transformation logic belongs in packages, not Notebooks**
-  - All main data transformation code is packages within a Python package/JAR/etc. These packages are then uploaded to DBFS and installed on the specifically configured cluster along with all other third party dependencies (ei. azure-cosmosdb-spark jar). Notebooks then import the python package and calls relevant functions. Effectively, the Notebooks become a lightweight wrapper around the notebook. This ensures Unit Test can be easily write for the transformation logic. This also applies to any custom Extraction and Loading logic.
+  - All main data transformation code should be packaged up within a Python package/JAR/etc. These packages are then uploaded to DBFS and installed on a specifically configured cluster, along with all other third-party dependencies (ei. azure-cosmosdb-spark jar). Notebooks then simply import the package(s) and calls any relevant functions. Effectively, Notebooks become a lightweight wrapper around the packages. This ensures seperation of concerns and promotes code reuse, testability, and code quality.
 - **Data should be tested**
   - Two different tests should be performed: 
     - **Structure** (is the data in the expected shape / schema?)
