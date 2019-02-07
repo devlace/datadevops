@@ -21,7 +21,7 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-# set -o xtrace # For debugging
+set -o xtrace # For debugging
 
 # Set path
 dir_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
@@ -34,16 +34,16 @@ release_id="${1-}"
 cluster_name="${2-}"
 mount_data_path="${3-}"
 mount_data_container="${4-}"
-database=${5-}
+database="${5-}"
 
 
 # Deploy clusters
 full_cluster_name=${cluster_name}_${release_id}
 cluster_config=$(cat ./config/cluster.config.template.json |
-    sed "s/__REPLACE_CLUSTER_NAME__/$full_cluster_name/g" |
-    sed "s/__REPLACE_MOUNT_DATA_PATH__/$mount_data_path/g" |
-    sed "s/__REPLACE_MOUNT_DATA_CONTAINER__/$mount_data_container/g" |
-    sed "s/__REPLACE_DATABASE__/$database/g")
+    sed "s~__REPLACE_CLUSTER_NAME__~${full_cluster_name}~g" |
+    sed "s~__REPLACE_MOUNT_DATA_PATH__~${mount_data_path}~g" |
+    sed "s~__REPLACE_MOUNT_DATA_CONTAINER__~${mount_data_container}~g" |
+    sed "s~__REPLACE_DATABASE__~${database}~g")
 databricks clusters create --json "$cluster_config"
 
 # Upload dependencies
