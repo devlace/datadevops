@@ -1,0 +1,14 @@
+{
+	"name": "Ds_MelbParkingData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ls_Rest_MelParkSensors",
+			"type": "LinkedServiceReference"
+		},
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "dtpv-d4pf.json",
+			"requestMethod": "GET"
+		}
+	}
+}
