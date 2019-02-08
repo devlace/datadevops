@@ -6,6 +6,11 @@
 			"referenceName": "Ls_Blob",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"infilepath": {
+				"type": "String"
+			}
+		},
 		"type": "AzureBlob",
 		"typeProperties": {
 			"format": {
@@ -13,7 +18,7 @@
 				"filePattern": "arrayOfObjects"
 			},
 			"fileName": {
-				"value": "@concat('MelbParkingData_', pipeline().RunId, utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')",
+				"value": "@dataset().infilepath",
 				"type": "Expression"
 			},
 			"folderPath": "lnd"
