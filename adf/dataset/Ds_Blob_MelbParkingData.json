@@ -15,7 +15,7 @@
 			},
 			"container": {
 				"type": "String",
-				"defaultValue": "datalake"
+				"defaultValue": "datalake/data/lnd"
 			}
 		},
 		"type": "AzureBlob",
