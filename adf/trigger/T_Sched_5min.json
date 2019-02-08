@@ -1,7 +1,7 @@
 {
 	"name": "T_Sched_5min",
 	"properties": {
-		"runtimeState": "Stopped",
+		"runtimeState": "Started",
 		"pipelines": [
 			{
 				"pipelineReference": {
