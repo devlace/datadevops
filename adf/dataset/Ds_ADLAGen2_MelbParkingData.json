@@ -10,11 +10,11 @@
 				"type": "String"
 			},
 			"infilefolder": {
-				"type": "String"
-			},
-			"container": {
 				"type": "String",
-				"defaultValue": "datalake/data/lnd"
+				"defaultValue": "data/lnd"
+			},
+			"datalake_fs": {
+				"type": "String"
 			}
 		},
 		"type": "AzureBlobFSFile",
@@ -28,7 +28,7 @@
 				"type": "Expression"
 			},
 			"folderPath": {
-				"value": "@concat(dataset().container, '/', dataset().infilefolder)",
+				"value": "@concat(dataset().datalake_fs, '/', dataset().infilefolder)",
 				"type": "Expression"
 			}
 		}
