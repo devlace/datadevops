@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "ddodfdev"
+		},
+		"Ls_Blob_connectionString": {
+			"value": ""
+		},
+		"Ds_Blob_MelbParkingData_properties_typeProperties_fileName": {
+			"value": "@dataset().infilename"
+		},
+		"Ds_Blob_MelbParkingData_properties_typeProperties_folderPath": {
+			"value": "@concat(dataset().container, '/', dataset().infilefolder)"
+		},
+		"Ls_KeyVault_properties_typeProperties_baseUrl": {
+			"value": "https://ddokvdev4uuuxyu5.vault.azure.net/"
+		},
+		"Ls_Rest_MelParkSensors_properties_typeProperties_url": {
+			"value": "https://data.melbourne.vic.gov.au/resource/"
+		}
+	}
+}
