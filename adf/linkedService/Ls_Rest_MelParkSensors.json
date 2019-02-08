@@ -1,0 +1,12 @@
+{
+	"name": "Ls_Rest_MelParkSensors",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://data.melbourne.vic.gov.au/resource/",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
