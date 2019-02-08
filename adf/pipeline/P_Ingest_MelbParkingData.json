@@ -27,7 +27,7 @@
 						"requestInterval": "00.00:00:00.010"
 					},
 					"sink": {
-						"type": "BlobSink"
+						"type": "AzureBlobFSSink"
 					},
 					"enableStaging": false,
 					"translator": {
@@ -51,7 +51,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "Ds_Blob_MelbParkingData",
+						"referenceName": "Ds_ADLAGen2_MelbParkingData",
 						"type": "DatasetReference",
 						"parameters": {
 							"infilename": {
@@ -61,7 +61,8 @@
 							"infilefolder": {
 								"value": "@variables('infilefolder')",
 								"type": "Expression"
-							}
+							},
+							"container": "datalake/data/lnd"
 						}
 					}
 				]
