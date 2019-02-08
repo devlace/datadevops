@@ -5,6 +5,14 @@
 			{
 				"name": "Download Melb Parking Data",
 				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set infilename",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -44,12 +52,22 @@
 				"outputs": [
 					{
 						"referenceName": "Ds_Blob_MelbParkingData",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"infilename": {
+								"value": "@variables('infilename')",
+								"type": "Expression"
+							},
+							"infilefolder": {
+								"value": "@variables('infilefolder')",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			},
 			{
-				"name": "Notebook1",
+				"name": "Process Melbourne Parking Data",
 				"type": "DatabricksNotebook",
 				"dependsOn": [
 					{
@@ -65,12 +83,37 @@
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
 					"secureInput": false
+				},
+				"typeProperties": {
+					"notebookPath": "/notebooks/01_transform",
+					"baseParameters": {
+						"infilepath": {
+							"value": "@concat(variables('infilefolder'), '/', variables('infilename'))",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "Ls_adb_01",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Set infilename",
+				"type": "SetVariable",
+				"typeProperties": {
+					"variableName": "infilename",
+					"value": "@concat('MelbParkingData_', pipeline().RunId, utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')"
 				}
 			}
 		],
-		"parameters": {
-			"infilepath": {
+		"variables": {
+			"infilename": {
 				"type": "String"
+			},
+			"infilefolder": {
+				"type": "String",
+				"defaultValue": "lnd"
 			}
 		}
 	}
