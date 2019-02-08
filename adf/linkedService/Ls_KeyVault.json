@@ -1,0 +1,9 @@
+{
+	"name": "Ls_KeyVault",
+	"properties": {
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://ddokvdev4uuuxyu5.vault.azure.net/"
+		}
+	}
+}
