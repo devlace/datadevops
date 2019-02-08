@@ -21,7 +21,7 @@
 		"typeProperties": {
 			"format": {
 				"type": "JsonFormat",
-				"filePattern": "arrayOfObjects"
+				"filePattern": "setOfObjects"
 			},
 			"fileName": {
 				"value": "@dataset().infilename",
