@@ -12,6 +12,10 @@
 			},
 			"infilefolder": {
 				"type": "String"
+			},
+			"container": {
+				"type": "String",
+				"defaultValue": "datalake"
 			}
 		},
 		"type": "AzureBlob",
@@ -25,7 +29,7 @@
 				"type": "Expression"
 			},
 			"folderPath": {
-				"value": "@dataset().infilefolder",
+				"value": "@concat(dataset().container, '/', dataset().infilefolder)",
 				"type": "Expression"
 			}
 		}

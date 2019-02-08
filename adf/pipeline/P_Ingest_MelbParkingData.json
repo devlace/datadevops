@@ -104,7 +104,10 @@
 				"type": "SetVariable",
 				"typeProperties": {
 					"variableName": "infilename",
-					"value": "@concat('MelbParkingData_', pipeline().RunId, utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')"
+					"value": {
+						"value": "@concat('MelbParkingData_', pipeline().RunId, utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')",
+						"type": "Expression"
+					}
 				}
 			}
 		],
