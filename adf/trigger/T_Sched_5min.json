@@ -5,7 +5,7 @@
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "P_MelbParkingData",
+					"referenceName": "P_Ingest_MelbParkingData",
 					"type": "PipelineReference"
 				}
 			}
