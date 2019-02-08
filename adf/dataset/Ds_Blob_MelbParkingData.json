@@ -7,7 +7,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"infilepath": {
+			"infilename": {
 				"type": "String"
 			},
 			"infilefolder": {
@@ -21,10 +21,13 @@
 				"filePattern": "arrayOfObjects"
 			},
 			"fileName": {
-				"value": "@dataset().infilepath",
+				"value": "@dataset().infilename",
 				"type": "Expression"
 			},
-			"folderPath": "lnd"
+			"folderPath": {
+				"value": "@dataset().infilefolder",
+				"type": "Expression"
+			}
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
