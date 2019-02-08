@@ -58,11 +58,10 @@
 								"value": "@variables('infilename')",
 								"type": "Expression"
 							},
-							"infilefolder": {
-								"value": "@variables('infilefolder')",
+							"datalake_fs": {
+								"value": "@variables('datalake_fs')",
 								"type": "Expression"
-							},
-							"container": "datalake/data/lnd"
+							}
 						}
 					}
 				]
@@ -106,7 +105,7 @@
 				"typeProperties": {
 					"variableName": "infilename",
 					"value": {
-						"value": "@concat('MelbParkingData_', pipeline().RunId, utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')",
+						"value": "@concat('MelbParkingData_', pipeline().RunId, '_', utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')",
 						"type": "Expression"
 					}
 				}
@@ -116,9 +115,9 @@
 			"infilename": {
 				"type": "String"
 			},
-			"infilefolder": {
+			"datalake_fs": {
 				"type": "String",
-				"defaultValue": "lnd"
+				"defaultValue": "datalake"
 			}
 		}
 	}
