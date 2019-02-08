@@ -37,7 +37,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "Ds_MelbParkingData",
+						"referenceName": "Ds_REST_MelbParkingData",
 						"type": "DatasetReference"
 					}
 				],
