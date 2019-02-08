@@ -1,0 +1,36 @@
+{
+	"name": "Ds_ADLAGen2_MelbParkingData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ls_ADLAGen2",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"infilename": {
+				"type": "String"
+			},
+			"infilefolder": {
+				"type": "String"
+			},
+			"container": {
+				"type": "String",
+				"defaultValue": "datalake/data/lnd"
+			}
+		},
+		"type": "AzureBlobFSFile",
+		"typeProperties": {
+			"format": {
+				"type": "JsonFormat",
+				"filePattern": "arrayOfObjects"
+			},
+			"fileName": {
+				"value": "@dataset().infilename",
+				"type": "Expression"
+			},
+			"folderPath": {
+				"value": "@concat(dataset().container, '/', dataset().infilefolder)",
+				"type": "Expression"
+			}
+		}
+	}
+}
