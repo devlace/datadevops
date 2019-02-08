@@ -43,11 +43,35 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "Ds_Blob_Dst01",
+						"referenceName": "Ds_Blob_MelbParkingData",
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Notebook1",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Download Melb Parking Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				}
 			}
-		]
+		],
+		"parameters": {
+			"infilepath": {
+				"type": "String"
+			}
+		}
 	}
 }

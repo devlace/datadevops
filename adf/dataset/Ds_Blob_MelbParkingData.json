@@ -1,5 +1,5 @@
 {
-	"name": "Ds_Blob_Dst01",
+	"name": "Ds_Blob_MelbParkingData",
 	"properties": {
 		"description": "Connection to your destination Azure Blob Store.",
 		"linkedServiceName": {
@@ -13,7 +13,7 @@
 				"filePattern": "arrayOfObjects"
 			},
 			"fileName": {
-				"value": "@concat('MelbParkingData_', utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')",
+				"value": "@concat('MelbParkingData_', pipeline().RunId, utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')",
 				"type": "Expression"
 			},
 			"folderPath": "lnd"
