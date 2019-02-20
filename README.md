@@ -10,17 +10,25 @@ The following shows the overall architecture of the solution.
 
 ![Architecture](images/architecture.PNG?raw=true "Architecture")
 
-### Design Principles
+### Design Considerations
 
 - **Data Transformation logic belongs in packages, not Notebooks**
   - All main data transformation code should be packaged up within a Python package/JAR/etc. These packages are then uploaded to DBFS and installed on a specifically configured cluster, along with all other third-party dependencies (ei. azure-cosmosdb-spark jar). Notebooks then simply import the package(s) and calls any relevant functions. Effectively, Notebooks become a lightweight wrapper around the packages. This ensures seperation of concerns and promotes code reuse, testability, and code quality.
 - **Data should be tested**
   - Two different tests should be performed: 
-    - **Structure** (is the data in the expected shape / schema?)
-    - **Content** (are there unexpected nulls? Are the summary statistics in expected ranges?)
+    - **Structure** (Is the data in the expected shape / schema?)
+    - **Content** (Are there unexpected nulls? Are the summary statistics in expected ranges?)
 - **Data should have lineage**
-  - Just as application deployments should have lineage so you can track which code commit produced the artifacts and deployments, each final loaded data record should be tagged with the appropriate ETL pipeline run id. Not only does this ensure traceability, it also helps with recovery from failed / half-run data loads.
+  - Just as application deployments should have lineage in order to track which code commit produced which artifacts and deployments, each final loaded data record should be tagged with the appropriate ETL pipeline run id. Not only does this ensure traceability, it also helps with recovery from any potential failed / half-run data loads.
 
+## Environments
+
+- **Dev** - Development collaboration branch which mirrors master branch
+- **QA** - Environment where all integration tests are run
+- **Staging** - A mirror of the production job, along with state and data. Deploying to staging first give the ability to "mock" a realistic release into production.
+- **Production**
+
+In addition to these environment, each developer may choose to have their own Development(s) environment for their individual use.
 
 ## CI/CD
 
@@ -52,7 +60,7 @@ The following shows the overall CI/CD process end to end.
   
 ### Release Pipelines
 
-Currently, there is one multi-stage release pipelines with the following stages, with each stage deploying to a different environment.
+Currently, there is one multi-stage release pipeline with the following stages. Each stage deploys to a different environment.
   
 1. **On-demand Integration Testing (QA) environment** - **TODO**
    1. Deploy Azure resources with ARM templates + Bash scripts
@@ -136,6 +144,25 @@ Notes:
   - **Workaround**: User is asked to supply the tokens during deployment, which is unfortunately cumbersome.
   - 
 ## Data
+
+### Physical layout
+
+ADLA Gen2 is structured as the following:
+------------
+
+    datalake                    <- filesystem
+        /libs                   <- contains all libs, jars, wheels needed for processing
+        /data
+            /lnd                <- landing folder where all data files are ingested into.
+            /databricks_delta   <- final tables 
+
+
+------------
+
+
+
+
+
 
 All data procured here: https://www.melbourne.vic.gov.au/about-council/governance-transparency/open-data/Pages/on-street-parking-data.aspx
 

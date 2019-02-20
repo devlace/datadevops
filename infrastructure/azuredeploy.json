@@ -101,7 +101,6 @@
             }
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/c20af4c3-6b7a-4ee8-b830-a2a69c4a56ac/resourceGroups/lacedbcicd/providers/Microsoft.Storage/storageAccounts/lacecicdstor02'.",
             "type": "Microsoft.Storage/storageAccounts",
             "sku": {
                 "name": "Standard_LRS",
