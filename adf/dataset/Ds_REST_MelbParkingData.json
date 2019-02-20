@@ -1,5 +1,5 @@
 {
-	"name": "Ds_MelbParkingData",
+	"name": "Ds_REST_MelbParkingData",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "Ls_Rest_MelParkSensors",
