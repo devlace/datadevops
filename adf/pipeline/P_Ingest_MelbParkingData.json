@@ -3,11 +3,17 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Download Melb Parking Data",
+				"name": "Download Sensor Data",
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Set infilename",
+						"activity": "Set infilename suffix",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set infilefolder",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -46,7 +52,10 @@
 				"inputs": [
 					{
 						"referenceName": "Ds_REST_MelbParkingData",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"relativeurl": "dtpv-d4pf.json"
+						}
 					}
 				],
 				"outputs": [
@@ -55,7 +64,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"infilename": {
-								"value": "@variables('infilename')",
+								"value": "@concat('MelbParkingSensorData', variables('infilename_suffix'))",
 								"type": "Expression"
 							},
 							"infilefolder": {
@@ -72,7 +81,13 @@
 				"type": "DatabricksNotebook",
 				"dependsOn": [
 					{
-						"activity": "Download Melb Parking Data",
+						"activity": "Download Sensor Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Download Bay Data",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -100,16 +115,81 @@
 				}
 			},
 			{
-				"name": "Set infilename",
+				"name": "Set infilename suffix",
 				"type": "SetVariable",
 				"typeProperties": {
-					"variableName": "infilename",
-					"value": "@concat('MelbParkingData_', pipeline().RunId, utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')"
+					"variableName": "infilename_suffx",
+					"value": {
+						"value": "@concat('_', pipeline().RunId, '_', utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')",
+						"type": "Expression"
+					}
 				}
+			},
+			{
+				"name": "Set infilefolder",
+				"type": "SetVariable",
+				"typeProperties": {
+					"variableName": "infilefolder",
+					"value": {
+						"value": "@utcnow('yyyy_MM_dd_hh_mm_ss')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Download Bay Data",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set infilename suffix",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set infilefolder",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010"
+					},
+					"sink": {
+						"type": "BlobSink"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "Ds_REST_MelbParkingData",
+						"type": "DatasetReference",
+						"parameters": {
+							"relativeurl": "wuf8-susg.json"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Ds_Blob_MelbParkingData",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"variables": {
-			"infilename": {
+			"infilename_suffx": {
 				"type": "String"
 			},
 			"infilefolder": {
