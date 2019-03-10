@@ -5,6 +5,11 @@
 			"referenceName": "Ls_Rest_MelParkSensors",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"url": {
+				"type": "String"
+			}
+		},
 		"type": "RestResource",
 		"typeProperties": {
 			"relativeUrl": "dtpv-d4pf.json",
