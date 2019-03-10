@@ -1,0 +1,14 @@
+{
+	"name": "Ds_REST_MelbParkingBayData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ls_Rest_MelParkSensors",
+			"type": "LinkedServiceReference"
+		},
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "wuf8-susg.json",
+			"requestMethod": "GET"
+		}
+	}
+}
