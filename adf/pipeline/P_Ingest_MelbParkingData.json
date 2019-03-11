@@ -103,8 +103,16 @@
 				"typeProperties": {
 					"notebookPath": "/notebooks/01_transform",
 					"baseParameters": {
-						"infilepath": {
-							"value": "@concat(variables('infilefolder'), '/', variables('infilename'))",
+						"infilefolder": {
+							"value": "@variables('infilefolder')",
+							"type": "Expression"
+						},
+						"infilepath_suffix": {
+							"value": "@variables('infilename_suffix')",
+							"type": "Expression"
+						},
+						"loadid": {
+							"value": "@pipeline().RunId",
 							"type": "Expression"
 						}
 					}
@@ -118,7 +126,7 @@
 				"name": "Set infilename suffix",
 				"type": "SetVariable",
 				"typeProperties": {
-					"variableName": "infilename_suffx",
+					"variableName": "infilename_suffix",
 					"value": {
 						"value": "@concat('_', pipeline().RunId, '_', utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')",
 						"type": "Expression"
@@ -183,13 +191,23 @@
 				"outputs": [
 					{
 						"referenceName": "Ds_Blob_MelbParkingData",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"infilename": {
+								"value": "@concat('MelbParkingBayData', variables('infilename_suffix'))",
+								"type": "Expression"
+							},
+							"infilefolder": {
+								"value": "@activity('Set infilefolder').output",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			}
 		],
 		"variables": {
-			"infilename_suffx": {
+			"infilename_suffix": {
 				"type": "String"
 			},
 			"infilefolder": {
