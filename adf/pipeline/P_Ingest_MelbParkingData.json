@@ -34,10 +34,6 @@
 							"value": "@variables('infilefolder')",
 							"type": "Expression"
 						},
-						"infilepath_suffix": {
-							"value": "@variables('infilename_suffix')",
-							"type": "Expression"
-						},
 						"loadid": {
 							"value": "@pipeline().RunId",
 							"type": "Expression"
@@ -50,23 +46,12 @@
 				}
 			},
 			{
-				"name": "Set infilename suffix",
-				"type": "SetVariable",
-				"typeProperties": {
-					"variableName": "infilename_suffix",
-					"value": {
-						"value": "@concat('_', pipeline().RunId, '.json')",
-						"type": "Expression"
-					}
-				}
-			},
-			{
 				"name": "Set infilefolder",
 				"type": "SetVariable",
 				"typeProperties": {
 					"variableName": "infilefolder",
 					"value": {
-						"value": "@concat('lnd/', utcnow('yyyy_MM_dd_hh_mm_ss'))",
+						"value": "@concat('datalake/data/lnd/', utcnow('yyyy_MM_dd_hh_mm_ss'))",
 						"type": "Expression"
 					}
 				}
@@ -76,7 +61,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Set infilename suffix",
+						"activity": "Set infilefolder",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -115,13 +100,10 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"infilefolder": {
-								"value": "@concat('MelbParkingSensorData', variables('infilename_suffix'))",
-								"type": "Expression"
-							},
-							"infilename": {
 								"value": "@variables('infilefolder')",
 								"type": "Expression"
-							}
+							},
+							"infilename": "MelbParkingSensorData.json"
 						}
 					}
 				]
@@ -170,22 +152,16 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"infilefolder": {
-								"value": "@concat('MelbParkingBayData', variables('infilename_suffix'))",
-								"type": "Expression"
-							},
-							"infilename": {
 								"value": "@variables('infilefolder')",
 								"type": "Expression"
-							}
+							},
+							"infilename": "MelbParkingBayData.json"
 						}
 					}
 				]
 			}
 		],
 		"variables": {
-			"infilename_suffix": {
-				"type": "String"
-			},
 			"infilefolder": {
 				"type": "String",
 				"defaultValue": "lnd"
