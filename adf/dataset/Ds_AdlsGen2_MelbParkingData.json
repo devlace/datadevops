@@ -1,0 +1,21 @@
+{
+	"name": "Ds_AdlsGen2_MelbParkingData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ls_AdlsGen2_01",
+			"type": "LinkedServiceReference"
+		},
+		"type": "AzureBlobFSFile",
+		"typeProperties": {
+			"format": {
+				"type": "TextFormat",
+				"columnDelimiter": ",",
+				"rowDelimiter": "",
+				"nullValue": "\\N",
+				"treatEmptyAsNull": true,
+				"skipLineCount": 0,
+				"firstRowAsHeader": false
+			}
+		}
+	}
+}
