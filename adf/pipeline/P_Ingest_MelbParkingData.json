@@ -3,91 +3,18 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Download Sensor Data",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Set infilename suffix",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "Set infilefolder",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"typeProperties": {
-					"source": {
-						"type": "RestSource",
-						"httpRequestTimeout": "00:01:40",
-						"requestInterval": "00.00:00:00.010"
-					},
-					"sink": {
-						"type": "BlobSink"
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"schemaMapping": {
-							"[':@computed_region_evbi_jbp8']": "[':@computed_region_evbi_jbp8']",
-							"bay_id": "bay_id",
-							"lat": "lat",
-							"location.type": "location.type",
-							"lon": "lon",
-							"st_marker_id": "st_marker_id",
-							"status": "status"
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "Ds_REST_MelbParkingData",
-						"type": "DatasetReference",
-						"parameters": {
-							"relativeurl": "dtpv-d4pf.json"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "Ds_Blob_MelbParkingData",
-						"type": "DatasetReference",
-						"parameters": {
-							"infilename": {
-								"value": "@concat('MelbParkingSensorData', variables('infilename_suffix'))",
-								"type": "Expression"
-							},
-							"infilefolder": {
-								"value": "@variables('infilefolder')",
-								"type": "Expression"
-							}
-						}
-					}
-				]
-			},
-			{
 				"name": "Transform and Load Melbourne Parking Data",
 				"description": "",
 				"type": "DatabricksNotebook",
 				"dependsOn": [
 					{
-						"activity": "Download Sensor Data",
+						"activity": "DownloadSensorData",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					},
 					{
-						"activity": "Download Bay Data",
+						"activity": "DownloadBayData",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -139,13 +66,13 @@
 				"typeProperties": {
 					"variableName": "infilefolder",
 					"value": {
-						"value": "@utcnow('yyyy_MM_dd_hh_mm_ss')",
+						"value": "@concat('lnd/', utcnow('yyyy_MM_dd_hh_mm_ss'))",
 						"type": "Expression"
 					}
 				}
 			},
 			{
-				"name": "Download Bay Data",
+				"name": "DownloadSensorData",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -153,7 +80,56 @@
 						"dependencyConditions": [
 							"Succeeded"
 						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010"
 					},
+					"sink": {
+						"type": "AzureBlobFSSink"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "Ds_REST_MelbParkingData",
+						"type": "DatasetReference",
+						"parameters": {
+							"relativeurl": "dtpv-d4pf.json"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Ds_AdlsGen2_MelbParkingData",
+						"type": "DatasetReference",
+						"parameters": {
+							"infilefolder": {
+								"value": "@concat('MelbParkingSensorData', variables('infilename_suffix'))",
+								"type": "Expression"
+							},
+							"infilename": {
+								"value": "@variables('infilefolder')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "DownloadBayData",
+				"type": "Copy",
+				"dependsOn": [
 					{
 						"activity": "Set infilefolder",
 						"dependencyConditions": [
@@ -175,7 +151,7 @@
 						"requestInterval": "00.00:00:00.010"
 					},
 					"sink": {
-						"type": "BlobSink"
+						"type": "AzureBlobFSSink"
 					},
 					"enableStaging": false
 				},
@@ -190,15 +166,15 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "Ds_Blob_MelbParkingData",
+						"referenceName": "Ds_AdlsGen2_MelbParkingData",
 						"type": "DatasetReference",
 						"parameters": {
-							"infilename": {
+							"infilefolder": {
 								"value": "@concat('MelbParkingBayData', variables('infilename_suffix'))",
 								"type": "Expression"
 							},
-							"infilefolder": {
-								"value": "@activity('Set infilefolder').output",
+							"infilename": {
+								"value": "@variables('infilefolder')",
 								"type": "Expression"
 							}
 						}
