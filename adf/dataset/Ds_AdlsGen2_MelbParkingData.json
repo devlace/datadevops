@@ -16,13 +16,8 @@
 		"type": "AzureBlobFSFile",
 		"typeProperties": {
 			"format": {
-				"type": "TextFormat",
-				"columnDelimiter": ",",
-				"rowDelimiter": "",
-				"nullValue": "\\N",
-				"treatEmptyAsNull": true,
-				"skipLineCount": 0,
-				"firstRowAsHeader": false
+				"type": "JsonFormat",
+				"filePattern": "arrayOfObjects"
 			},
 			"fileName": {
 				"value": "@dataset().infilename",
