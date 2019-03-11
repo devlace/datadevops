@@ -5,6 +5,14 @@
 			"referenceName": "Ls_AdlsGen2_01",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"infilefolder": {
+				"type": "String"
+			},
+			"infilename": {
+				"type": "String"
+			}
+		},
 		"type": "AzureBlobFSFile",
 		"typeProperties": {
 			"format": {
@@ -15,6 +23,14 @@
 				"treatEmptyAsNull": true,
 				"skipLineCount": 0,
 				"firstRowAsHeader": false
+			},
+			"fileName": {
+				"value": "@dataset().infilename",
+				"type": "Expression"
+			},
+			"folderPath": {
+				"value": "@dataset().infilefolder",
+				"type": "Expression"
 			}
 		}
 	}
