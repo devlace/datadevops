@@ -12,7 +12,6 @@ def main(args=None):
                "ddo_transform.cli.main")
     click.echo("See click documentation at http://click.pocoo.org/")
 
-    
     return 0
 
 

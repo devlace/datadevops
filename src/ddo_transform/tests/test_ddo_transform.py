@@ -5,7 +5,7 @@
 
 import os
 import pytest
-
+import datetime
 from click.testing import CliRunner
 
 from ddo_transform import ddo_transform
@@ -28,12 +28,16 @@ def spark():
     return spark
 
 
-def test_transform(spark):
+def test_process_dim_parking_bay(spark):
     """Test data transform"""
-    df = spark.read.csv("./data/On-street_Parking_Bay_Sensors.csv")
-    count = ddo_transform.transform(df)
-    print(count)
-    # df = ddo_transform(spark, sample_df)
+    parkingbay_sdf = spark.read.json("./data/MelbParkingBayData.json", multiLine=True)
+    dim_parkingbay_sdf = spark.read.json("./data/dim_parking_bay.json", multiLine=True)
+    load_id = 1
+    loaded_on = datetime.datetime.now()
+    results_df = ddo_transform.process_dim_parking_bay(parkingbay_sdf, dim_parkingbay_sdf, load_id, loaded_on)
+
+    # TODO add more asserts
+    assert results_df.count() != 0
 
 
 def test_command_line_interface():
