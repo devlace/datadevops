@@ -13,9 +13,9 @@ import datetime
 # infilefolder = 'datalake/data/lnd/2019_03_11_01_38_00/'
 load_id = loadid
 loaded_on = datetime.datetime.now()
-
-parkingbay_filepath = 'dbfs:/mnt/' + infilefolder + "MelbParkingBayData.json"
-sensors_filepath = 'dbfs:/mnt/' + infilefolder + "MelbParkingSensorData.json"
+base_path = 'dbfs:/mnt/datalake/data/lnd/'
+parkingbay_filepath = base_path + infilefolder + "/MelbParkingBayData.json"
+sensors_filepath = base_path + infilefolder + "/MelbParkingSensorData.json"
 
 # COMMAND ----------
 
