@@ -3,28 +3,41 @@
 
 """Tests for `ddo_transform` package."""
 
+import os
 import pytest
-
+import datetime
 from click.testing import CliRunner
 
 from ddo_transform import ddo_transform
 from ddo_transform import cli
 
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 @pytest.fixture
-def response():
-    """Sample pytest fixture.
-
-    See more at: http://doc.pytest.org/en/latest/fixture.html
+def spark():
+    """Spark Session fixture
     """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+    from pyspark.sql import SparkSession
+
+    spark = SparkSession.builder\
+        .master("local[2]")\
+        .appName("Unit Testing")\
+        .getOrCreate()
+    spark.sparkContext.setLogLevel("ERROR")
+    return spark
 
 
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
+def test_process_dim_parking_bay(spark):
+    """Test data transform"""
+    parkingbay_sdf = spark.read.json("./data/MelbParkingBayData.json", multiLine=True)
+    dim_parkingbay_sdf = spark.read.json("./data/dim_parking_bay.json", multiLine=True)
+    load_id = 1
+    loaded_on = datetime.datetime.now()
+    results_df = ddo_transform.process_dim_parking_bay(parkingbay_sdf, dim_parkingbay_sdf, load_id, loaded_on)
+
+    # TODO add more asserts
+    assert results_df.count() != 0
 
 
 def test_command_line_interface():

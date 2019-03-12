@@ -41,6 +41,11 @@ kvOwnerObjectId="${5-}"
 
 env_file="../.env.${env_name}"
 deploy_name="test"
+
+# Set path
+dir_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P ); cd "$dir_path"
+
+
 #####################
 # DEPLOY ARM TEMPLATE
 
