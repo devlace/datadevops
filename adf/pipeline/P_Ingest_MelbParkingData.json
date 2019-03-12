@@ -28,7 +28,7 @@
 					"secureInput": false
 				},
 				"typeProperties": {
-					"notebookPath": "/notebooks/01_transform",
+					"notebookPath": "/notebooks/02_transform",
 					"baseParameters": {
 						"infilefolder": {
 							"value": "@variables('infilefolder')",
@@ -51,7 +51,7 @@
 				"typeProperties": {
 					"variableName": "infilefolder",
 					"value": {
-						"value": "@concat('datalake/data/lnd/', utcnow('yyyy_MM_dd_hh_mm_ss'))",
+						"value": "@utcnow('yyyy_MM_dd_hh_mm_ss')",
 						"type": "Expression"
 					}
 				}
@@ -103,7 +103,8 @@
 								"value": "@variables('infilefolder')",
 								"type": "Expression"
 							},
-							"infilename": "MelbParkingSensorData.json"
+							"infilename": "MelbParkingSensorData.json",
+							"container": "datalake/data/lnd"
 						}
 					}
 				]
@@ -155,7 +156,8 @@
 								"value": "@variables('infilefolder')",
 								"type": "Expression"
 							},
-							"infilename": "MelbParkingBayData.json"
+							"infilename": "MelbParkingBayData.json",
+							"container": "datalake/data/lnd"
 						}
 					}
 				]
