@@ -142,7 +142,8 @@ Notes:
   - **Workaround**: Use normal Databricks secrets with the downside of duplicated information.
 - Databricks Personal Access Tokens can only be created via the UI.
   - **Workaround**: User is asked to supply the tokens during deployment, which is unfortunately cumbersome.
-  - 
+- Data Factory Databricks Linked Service does not support dynamic configuration, thus needing a manual step to point to new cluster during deployment of pipeline to a new environment.
+  - **Workaround**: Alternative is to create an on-demand cluster however this may introduce latency issues with cluster spin up time. Optionally, user can manually update Linked Service to point to correct cluster.
 ## Data
 
 ### Physical layout
