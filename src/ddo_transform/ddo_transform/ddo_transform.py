@@ -2,6 +2,10 @@
 
 """Main module."""
 
-def transform():
+from pyspark.sql import DataFrame, SparkSession
+
+
+def transform(spark: SparkSession, df: DataFrame):
     print("transform!!")
-    pass
+    count = df.count()
+    return(count)

@@ -85,6 +85,7 @@ for env_name in dev stg prod; do
     # Azure infrastructure
     . ./infrastructure/deploy_infrastructure.sh "$env_name" "$rg_name_pre-$env_name" $rg_location $sub_id $kvOwnerObjectId
 
+    # BREAK! User input of Databricks token in .env file required
     # Databricks
     . ./databricks/create_secrets.sh "$env_name"
     . ./databricks/configure_databricks.sh "$env_name"
