@@ -1,34 +1,34 @@
 {
-	"name": "Ds_AdlsGen2_MelbParkingData",
+	"name": "Ds_ADLAGen2_MelbParkingData",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Ls_AdlsGen2_01",
+			"referenceName": "Ls_ADLAGen2",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"infilefolder": {
-				"type": "String"
-			},
 			"infilename": {
 				"type": "String"
 			},
-			"container": {
+			"infilefolder": {
 				"type": "String",
-				"defaultValue": "datalake/data/lnd"
+				"defaultValue": "data/lnd"
+			},
+			"datalake_fs": {
+				"type": "String"
 			}
 		},
 		"type": "AzureBlobFSFile",
 		"typeProperties": {
 			"format": {
 				"type": "JsonFormat",
-				"filePattern": "arrayOfObjects"
+				"filePattern": "setOfObjects"
 			},
 			"fileName": {
 				"value": "@dataset().infilename",
 				"type": "Expression"
 			},
 			"folderPath": {
-				"value": "@concat(dataset().container, '/', dataset().infilefolder)",
+				"value": "@concat(dataset().datalake_fs, '/', dataset().infilefolder)",
 				"type": "Expression"
 			}
 		}
