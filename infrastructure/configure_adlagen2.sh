@@ -32,7 +32,7 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-set -o xtrace # For debugging
+# set -o xtrace # For debugging
 
 ################
 # PARAMETERS
@@ -53,9 +53,9 @@ storage_account_id=$(az storage account show \
     jq -r '.id')
 
 # Grant "Storage Blob Data Owner (Preview)
-echo "Granting 'Storage Blob Data Contributor (Preview)' for '$storage_account' to SP"
+echo "Granting 'Storage Blob Data Contributor' for '$storage_account' to SP"
 az role assignment create --assignee "$sp_stor_id" \
-    --role "Storage Blob Data Contributor (Preview)" \
+    --role "Storage Blob Data Contributor" \
     --scope "$storage_account_id"
 
 # Because ADLA Gen2 is not yet supported by the az cli 2.0 as of 2019/02/04
