@@ -8,11 +8,17 @@
 		"Ls_Blob_connectionString": {
 			"value": ""
 		},
-		"Ds_Blob_MelbParkingData_properties_typeProperties_fileName": {
+		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
 			"value": "@dataset().infilename"
 		},
-		"Ds_Blob_MelbParkingData_properties_typeProperties_folderPath": {
+		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath": {
 			"value": "@concat(dataset().container, '/', dataset().infilefolder)"
+		},
+		"Ls_ADLAGen2_properties_typeProperties_url": {
+			"value": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
+		},
+		"Ls_AdlsGen2_01_properties_typeProperties_url": {
+			"value": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
 		},
 		"Ls_KeyVault_properties_typeProperties_baseUrl": {
 			"value": "https://ddokvdev4uuuxyu5.vault.azure.net/"

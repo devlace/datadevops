@@ -19,11 +19,19 @@
 			"type": "string",
 			"defaultValue": "https://data.melbourne.vic.gov.au/resource/"
 		},
-		"Ds_Blob_MelbParkingData_properties_typeProperties_fileName": {
+		"Ls_ADLAGen2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
+		},
+		"Ls_AdlsGen2_01_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
+		},
+		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
 			"type": "string",
 			"defaultValue": "@dataset().infilename"
 		},
-		"Ds_Blob_MelbParkingData_properties_typeProperties_folderPath": {
+		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath": {
 			"type": "string",
 			"defaultValue": "@concat(dataset().container, '/', dataset().infilefolder)"
 		}
@@ -74,49 +82,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Ds_Blob_MelbParkingData')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Connection to your destination Azure Blob Store.",
-				"linkedServiceName": {
-					"referenceName": "Ls_Blob",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"infilename": {
-						"type": "String"
-					},
-					"infilefolder": {
-						"type": "String"
-					},
-					"container": {
-						"type": "String",
-						"defaultValue": "datalake/data/lnd"
-					}
-				},
-				"annotations": [],
-				"type": "AzureBlob",
-				"typeProperties": {
-					"format": {
-						"type": "JsonFormat",
-						"filePattern": "arrayOfObjects"
-					},
-					"fileName": {
-						"value": "[parameters('Ds_Blob_MelbParkingData_properties_typeProperties_fileName')]",
-						"type": "Expression"
-					},
-					"folderPath": {
-						"value": "[parameters('Ds_Blob_MelbParkingData_properties_typeProperties_folderPath')]",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ls_Blob')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Ds_REST_MelbParkingData')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -125,15 +90,69 @@
 					"referenceName": "Ls_Rest_MelParkSensors",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"relativeurl": {
+						"type": "String"
+					}
+				},
 				"annotations": [],
 				"type": "RestResource",
 				"typeProperties": {
-					"relativeUrl": "dtpv-d4pf.json",
+					"relativeUrl": {
+						"value": "@dataset().relativeurl",
+						"type": "Expression"
+					},
 					"requestMethod": "GET"
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Ls_Rest_MelParkSensors')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ls_ADLAGen2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('Ls_ADLAGen2_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Ls_KeyVault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "storageKey"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_KeyVault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ls_AdlsGen2_01')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('Ls_AdlsGen2_01_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Ls_KeyVault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "storageKey"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_KeyVault')]"
 			]
 		},
 		{
@@ -161,17 +180,116 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Ds_AdlsGen2_MelbParkingData')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ls_AdlsGen2_01",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"infilefolder": {
+						"type": "String"
+					},
+					"infilename": {
+						"type": "String"
+					},
+					"container": {
+						"type": "String",
+						"defaultValue": "datalake/data/lnd"
+					}
+				},
+				"annotations": [],
+				"type": "AzureBlobFSFile",
+				"typeProperties": {
+					"format": {
+						"type": "JsonFormat",
+						"filePattern": "arrayOfObjects"
+					},
+					"fileName": {
+						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName')]",
+						"type": "Expression"
+					},
+					"folderPath": {
+						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath')]",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_AdlsGen2_01')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/P_Ingest_MelbParkingData')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "Download Melb Parking Data",
+						"name": "Transform and Load Melbourne Parking Data",
+						"description": "",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "DownloadSensorData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DownloadBayData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/notebooks/01_transform",
+							"baseParameters": {
+								"infilefolder": {
+									"value": "@variables('infilefolder')",
+									"type": "Expression"
+								},
+								"loadid": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "Ls_adb_01",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Set infilefolder",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "infilefolder",
+							"value": {
+								"value": "@concat('datalake/data/lnd/', utcnow('yyyy_MM_dd_hh_mm_ss'))",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "DownloadSensorData",
 						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "Set infilename",
+								"activity": "Set infilefolder",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -192,53 +310,39 @@
 								"requestInterval": "00.00:00:00.010"
 							},
 							"sink": {
-								"type": "BlobSink"
+								"type": "AzureBlobFSSink"
 							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"schemaMapping": {
-									"[[':@computed_region_evbi_jbp8']": "[concat('[', ''':@computed_region_evbi_jbp8'']')]",
-									"bay_id": "bay_id",
-									"lat": "lat",
-									"location.type": "location.type",
-									"lon": "lon",
-									"st_marker_id": "st_marker_id",
-									"status": "status"
-								}
-							}
+							"enableStaging": false
 						},
 						"inputs": [
 							{
 								"referenceName": "Ds_REST_MelbParkingData",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"relativeurl": "dtpv-d4pf.json"
+								}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "Ds_Blob_MelbParkingData",
+								"referenceName": "Ds_AdlsGen2_MelbParkingData",
 								"type": "DatasetReference",
 								"parameters": {
-									"infilename": {
-										"value": "@variables('infilename')",
-										"type": "Expression"
-									},
 									"infilefolder": {
 										"value": "@variables('infilefolder')",
 										"type": "Expression"
-									}
+									},
+									"infilename": "MelbParkingSensorData.json"
 								}
 							}
 						]
 					},
 					{
-						"name": "Transform and Load Melbourne Parking Data",
-						"description": "",
-						"type": "DatabricksNotebook",
+						"name": "DownloadBayData",
+						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "Download Melb Parking Data",
+								"activity": "Set infilefolder",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -253,37 +357,41 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"notebookPath": "/notebooks/01_transform",
-							"baseParameters": {
-								"infilepath": {
-									"value": "@concat(variables('infilefolder'), '/', variables('infilename'))",
-									"type": "Expression"
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010"
+							},
+							"sink": {
+								"type": "AzureBlobFSSink"
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Ds_REST_MelbParkingData",
+								"type": "DatasetReference",
+								"parameters": {
+									"relativeurl": "wuf8-susg.json"
 								}
 							}
-						},
-						"linkedServiceName": {
-							"referenceName": "Ls_adb_01",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Set infilename",
-						"type": "SetVariable",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "infilename",
-							"value": {
-								"value": "@concat('MelbParkingData_', pipeline().RunId, utcnow('yyyy_MM_dd_hh_mm_ss'), '.json')",
-								"type": "Expression"
+						],
+						"outputs": [
+							{
+								"referenceName": "Ds_AdlsGen2_MelbParkingData",
+								"type": "DatasetReference",
+								"parameters": {
+									"infilefolder": {
+										"value": "@variables('infilefolder')",
+										"type": "Expression"
+									},
+									"infilename": "MelbParkingBayData.json"
+								}
 							}
-						}
+						]
 					}
 				],
 				"variables": {
-					"infilename": {
-						"type": "String"
-					},
 					"infilefolder": {
 						"type": "String",
 						"defaultValue": "lnd"
@@ -292,9 +400,9 @@
 				"annotations": []
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_adb_01')]",
 				"[concat(variables('factoryId'), '/datasets/Ds_REST_MelbParkingData')]",
-				"[concat(variables('factoryId'), '/datasets/Ds_Blob_MelbParkingData')]",
-				"[concat(variables('factoryId'), '/linkedServices/Ls_adb_01')]"
+				"[concat(variables('factoryId'), '/datasets/Ds_AdlsGen2_MelbParkingData')]"
 			]
 		},
 		{

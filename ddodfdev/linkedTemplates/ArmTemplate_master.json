@@ -11,13 +11,21 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Ls_Blob'"
 		},
-		"Ds_Blob_MelbParkingData_properties_typeProperties_fileName": {
+		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
 			"type": "string",
 			"defaultValue": "@dataset().infilename"
 		},
-		"Ds_Blob_MelbParkingData_properties_typeProperties_folderPath": {
+		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath": {
 			"type": "string",
 			"defaultValue": "@concat(dataset().container, '/', dataset().infilefolder)"
+		},
+		"Ls_ADLAGen2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
+		},
+		"Ls_AdlsGen2_01_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
 		},
 		"Ls_KeyVault_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -63,11 +71,17 @@
 					"Ls_Rest_MelParkSensors_properties_typeProperties_url": {
 						"value": "[parameters('Ls_Rest_MelParkSensors_properties_typeProperties_url')]"
 					},
-					"Ds_Blob_MelbParkingData_properties_typeProperties_fileName": {
-						"value": "[parameters('Ds_Blob_MelbParkingData_properties_typeProperties_fileName')]"
+					"Ls_ADLAGen2_properties_typeProperties_url": {
+						"value": "[parameters('Ls_ADLAGen2_properties_typeProperties_url')]"
 					},
-					"Ds_Blob_MelbParkingData_properties_typeProperties_folderPath": {
-						"value": "[parameters('Ds_Blob_MelbParkingData_properties_typeProperties_folderPath')]"
+					"Ls_AdlsGen2_01_properties_typeProperties_url": {
+						"value": "[parameters('Ls_AdlsGen2_01_properties_typeProperties_url')]"
+					},
+					"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
+						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName')]"
+					},
+					"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath": {
+						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath')]"
 					}
 				}
 			},
