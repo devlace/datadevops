@@ -3,30 +3,16 @@ ddo_transform
 =============
 
 
-.. image:: https://img.shields.io/pypi/v/ddo_transform.svg
-        :target: https://pypi.python.org/pypi/ddo_transform
-
-.. image:: https://img.shields.io/travis/devlace/ddo_transform.svg
-        :target: https://travis-ci.org/devlace/ddo_transform
-
-.. image:: https://readthedocs.org/projects/ddo-transform/badge/?version=latest
-        :target: https://ddo-transform.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
+.. image:: https://dev.azure.com/msdevlace/DataDevOps/_apis/build/status/DDO-Python-CI-Artifacts
+        :target: https://dev.azure.com/msdevlace/DataDevOps/_build/latest?definitionId=23
+        :alt: Build Status
 
 
-
-
-Python Boilerplate contains all the boilerplate you need to create a Python package.
-
+This package contains all business/data transformation logic for ETL pipeline.
 
 * Free software: MIT license
 * Documentation: https://ddo-transform.readthedocs.io.
 
-
-Features
---------
-
-* TODO
 
 Credits
 -------

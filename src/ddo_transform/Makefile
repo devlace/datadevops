@@ -86,3 +86,13 @@ dist: clean ## builds source and wheel package
 
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
+
+installedit: clean ## install the package while dynamically picking up changes to source files
+	pip install --editable .
+
+installdatabricks: dist ## install the package in databricks
+	databricks fs rm dbfs:/Wheels/ --recursive
+	package_name="$$(find dist/*.whl -printf "%f\n")"; \
+	databricks fs cp dist/"$$package_name" "dbfs:/Wheels/$$package_name";\
+	databricks libraries install --cluster-id $(databricks_clusterid) --whl "dbfs:/Wheels/$$package_name"
+	databricks clusters restart --cluster-id $(databricks_clusterid)
