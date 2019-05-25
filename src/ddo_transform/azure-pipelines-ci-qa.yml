@@ -3,10 +3,11 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-  pr:
-  - master
-  - releases/*
+pr:
+  branches:
+    include:
+    - master
+    - releases/*
   paths:
     include:
     - src/ddo_transform/*
