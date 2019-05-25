@@ -13,7 +13,7 @@ trigger:
 
 variables:
   WORKING_DIR: 'src/ddo_transform'
-  ARTIFACTS_FEED_NAME: devlacepub
+  ARTIFACTS_FEED_NAME: DataDevOpsFeed
   PACKAGE_MAJOR_VERSION:  1
   PACKAGE_MINOR_VERSION:  1
   PACKAGE_PATCH_VERSION:  $(Build.BuildId)
