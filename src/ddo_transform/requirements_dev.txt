@@ -7,7 +7,6 @@ tox
 coverage
 Sphinx
 twine
-pyspark
 click
 
 pytest
