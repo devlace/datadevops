@@ -1,0 +1,62 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - src/ddo_transform/*
+
+variables:
+  WORKING_DIR: 'src/ddo_transform'
+  ARTIFACTS_FEED_NAME: devlacepub
+  PACKAGE_MAJOR_VERSION:  1
+  PACKAGE_MINOR_VERSION:  1
+  PACKAGE_PATCH_VERSION:  $(Build.BuildId)
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.6'
+    architecture: 'x64'
+
+- task: PipAuthenticate@0
+  displayName: 'Authenticate to artifact feed'
+  inputs:
+    artifactFeeds: $(ARTIFACTS_FEED_NAME)
+
+- script: pip install -r requirements_dev.txt && pip install -r requirements.txt
+  workingDirectory: $(WORKING_DIR)
+  displayName: 'Install requirements'
+
+- script: make lint && make tests 
+  workingDirectory: $(WORKING_DIR)
+  displayName: 'Run lint tests'
+
+- script: make test && make lint
+  workingDirectory: $(WORKING_DIR)
+  displayName: 'Run lint tests'
+
+- script: make dist
+  env:
+    package_version: $(PACKAGE_MAJOR_VERSION).$(PACKAGE_MINOR_VERSION).$(PACKAGE_PATCH_VERSION)
+  workingDirectory: $(WORKING_DIR)
+  displayName: 'Create wheel package'
+
+- task: TwineAuthenticate@0
+  inputs:
+    artifactFeeds: $(ARTIFACTS_FEED_NAME)
+  displayName: 'Authenticate to artifact feed'
+
+- script: cat $(PYPIRC_PATH)
+
+- script: twine upload -r $(ARTIFACTS_FEED_NAME) --config-file $(PYPIRC_PATH) dist/*
+  displayName: 'upload to artifact feed'
+  workingDirectory: $(WORKING_DIR)
