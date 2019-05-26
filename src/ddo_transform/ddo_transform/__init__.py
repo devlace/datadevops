@@ -4,4 +4,4 @@
 
 __author__ = """Lace Lofranco"""
 __email__ = 'lace.lofranco@microsoft.com'
-__version__ = '0.1.0'
+__version__ = '{{version}}'
