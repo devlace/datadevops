@@ -55,8 +55,18 @@ steps:
     artifactFeeds: $(ARTIFACTS_FEED_NAME)
   displayName: 'Authenticate to artifact feed'
 
-- script: cat $(PYPIRC_PATH)
-
 - script: twine upload -r $(ARTIFACTS_FEED_NAME) --config-file $(PYPIRC_PATH) dist/*
   displayName: 'upload to artifact feed'
   workingDirectory: $(WORKING_DIR)
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'databricks'
+    ArtifactName: 'databricks'
+  displayName: 'Publish Databricks Artifacts'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'adf/_scripts/deploymentadf.ps1'
+    ArtifactName: 'adf_scripts'
+  displayName: 'Publish ADF Scripts'
