@@ -61,6 +61,12 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
+    PathtoPublish: '$(WORKING_DIR)/dist'
+    ArtifactName: 'dist'
+  displayName: 'Publish Dist Artifacts'
+
+- task: PublishBuildArtifacts@1
+  inputs:
     PathtoPublish: 'databricks'
     ArtifactName: 'databricks'
   displayName: 'Publish Databricks Artifacts'
