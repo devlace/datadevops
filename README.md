@@ -1,6 +1,6 @@
-# DataDevOps
+[![Build Status](https://dev.azure.com/devlacepub/DataDevOps/_apis/build/status/ddo_transform-ci-artifacts?branchName=master)](https://dev.azure.com/devlacepub/DataDevOps/_build/latest?definitionId=3&branchName=master)
 
-*This repository is currently a work in progress.*
+# DataDevOps
 
 The purpose of this repository is to demonstrate how DevOps principles can be applied Data Pipeline Solution. 
 
@@ -21,7 +21,17 @@ The following shows the overall architecture of the solution.
 - **Data should have lineage**
   - Just as application deployments should have lineage in order to track which code commit produced which artifacts and deployments, each final loaded data record should be tagged with the appropriate ETL pipeline run id. Not only does this ensure traceability, it also helps with recovery from any potential failed / half-run data loads.
 
-## Environments
+## Build and Release Pipeline
+
+The following shows the overall CI/CD process end to end.
+
+![CI/CD](images/CI_CD.PNG?raw=true "CI/CD")
+
+Both Build and Release Pipelines are built using [AzureDevOps](https://dev.azure.com/) (Public instance) and can be view using the following links:
+- [Build Pipelines](https://dev.azure.com/devlacepub/DataDevOps/_build)
+- [Release Pipeline](https://dev.azure.com/devlacepub/DataDevOps/_release)
+
+### Environments
 
 - **Dev** - Development collaboration branch which mirrors master branch
 - **QA** - Environment where all integration tests are run
@@ -29,12 +39,6 @@ The following shows the overall architecture of the solution.
 - **Production**
 
 In addition to these environment, each developer may choose to have their own Development(s) environment for their individual use.
-
-## CI/CD
-
-The following shows the overall CI/CD process end to end.
-
-![CI/CD](images/CI_CD.PNG?raw=true "CI/CD")
 
 ### Build Pipelines
 
@@ -110,6 +114,10 @@ Currently, there is one multi-stage release pipeline with the following stages. 
 ## Monitoring
 
 TODO
+
+### Databricks
+
+### Data Factory
 
 ## Deploy the solution
 

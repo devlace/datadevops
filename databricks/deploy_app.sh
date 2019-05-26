@@ -27,7 +27,7 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-set -o xtrace # For debugging
+# set -o xtrace # For debugging
 
 # Set path
 dir_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
