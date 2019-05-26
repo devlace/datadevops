@@ -80,6 +80,7 @@ release: dist ## package and upload a release
 	twine upload dist/*
 
 dist: clean ## builds source and wheel package
+	sed -i "s/{{version}}/$(package_version)/g" ddo_transform/__init__.py
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
