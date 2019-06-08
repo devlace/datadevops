@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: 'vs2017-latest'
+  vmImage: 'vs2017-win2016'
 
 steps:
 - task: VSBuild@1
