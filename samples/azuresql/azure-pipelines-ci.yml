@@ -9,27 +9,32 @@ trigger:
 pool:
   vmImage: 'vs2017-win2016'
 
+variables:
+  SLN_DIR: 'samples\azuresql\ddo_samples_azuresql'
+  BUILD_PLATFORM: 'any cpu'
+  BUILD_CONFIGURATION: 'release'
+
 steps:
 - task: VSBuild@1
-  displayName: 'Build solution samples\**\*.sln'
+  displayName: 'Build solution sln'
   inputs:
-    solution: '$(Parameters.solution)'
-    platform: '$(BuildPlatform)'
-    configuration: '$(BuildConfiguration)'
+    solution: '$(SLN_DIR)\ddo_samples_azuresql.sln'
+    platform: '$(BUILD_PLATFORM)'
+    configuration: '$(BUILD_CONFIGURATION)'
 
 - task: VSTest@2
   displayName: 'VsTest - testAssemblies'
   inputs:
     testAssemblyVer2: |
-     **\$(BuildConfiguration)\*test*.dll
+     $(SLN_DIR)\**\$(BUILD_CONFIGURATION)\*test*.dll
      !**\obj\**
-    platform: '$(BuildPlatform)'
-    configuration: '$(BuildConfiguration)'
+    platform: '$(BUILD_PLATFORM)'
+    configuration: '$(BUILD_CONFIGURATION)'
 
 - task: PublishSymbols@2
   displayName: 'Publish symbols path'
   inputs:
-    SearchPattern: '**\bin\**\*.pdb'
+    SearchPattern: '$(SLN_DIR)\**\bin\**\*.pdb'
     PublishSymbols: false
   continueOnError: true
 
@@ -37,6 +42,6 @@ steps:
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
   inputs:
     SourceFolder: '$(system.defaultworkingdirectory)'
-    Contents: '**\bin\$(BuildConfiguration)\**'
+    Contents: '$(SLN_DIR)\**\bin\$(BUILD_CONFIGURATION)\**'
     TargetFolder: '$(build.artifactstagingdirectory)'
   condition: succeededOrFailed()
