@@ -11,7 +11,7 @@ pool:
 
 steps:
 - task: VSBuild@1
-  displayName: 'Build solution **\*.sln'
+  displayName: 'Build solution samples\**\*.sln'
   inputs:
     solution: '$(Parameters.solution)'
     platform: '$(BuildPlatform)'
