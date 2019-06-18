@@ -27,7 +27,7 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-# set -o xtrace # For debugging
+set -o xtrace # For debugging
 
 # Set path
 dir_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
@@ -46,7 +46,7 @@ cd "$dir_path"
 
 
 # Deploy clusters
-full_cluster_name=${CLUSTER_NAME}
+full_cluster_name=${CLUSTER_NAME}_${RELEASE_ID}
 cluster_config=$(cat ./config/cluster.config.template.json |
     sed "s~__REPLACE_CLUSTER_NAME__~${full_cluster_name}~g" |
     sed "s~__REPLACE_MOUNT_DATA_PATH__~${MOUNT_DATA_PATH}~g" |
