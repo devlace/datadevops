@@ -19,10 +19,6 @@
 			"type": "string",
 			"defaultValue": "@concat(dataset().container, '/', dataset().infilefolder)"
 		},
-		"Ls_ADLAGen2_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
-		},
 		"Ls_AdlsGen2_01_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
@@ -70,9 +66,6 @@
 					},
 					"Ls_Rest_MelParkSensors_properties_typeProperties_url": {
 						"value": "[parameters('Ls_Rest_MelParkSensors_properties_typeProperties_url')]"
-					},
-					"Ls_ADLAGen2_properties_typeProperties_url": {
-						"value": "[parameters('Ls_ADLAGen2_properties_typeProperties_url')]"
 					},
 					"Ls_AdlsGen2_01_properties_typeProperties_url": {
 						"value": "[parameters('Ls_AdlsGen2_01_properties_typeProperties_url')]"

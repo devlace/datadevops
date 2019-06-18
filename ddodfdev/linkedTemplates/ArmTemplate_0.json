@@ -19,10 +19,6 @@
 			"type": "string",
 			"defaultValue": "https://data.melbourne.vic.gov.au/resource/"
 		},
-		"Ls_ADLAGen2_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
-		},
 		"Ls_AdlsGen2_01_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
@@ -110,29 +106,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Ls_ADLAGen2')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('Ls_ADLAGen2_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "Ls_KeyVault",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "storageKey"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ls_KeyVault')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Ls_AdlsGen2_01')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -172,7 +145,7 @@
 						},
 						"secretName": "dbricksToken"
 					},
-					"existingClusterId": "0206-120735-lean805"
+					"existingClusterId": "0310-082109-sappy184"
 				}
 			},
 			"dependsOn": [
@@ -254,7 +227,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"notebookPath": "/notebooks/01_transform",
+							"notebookPath": "/notebooks/02_transform",
 							"baseParameters": {
 								"infilefolder": {
 									"value": "@variables('infilefolder')",
@@ -279,7 +252,7 @@
 						"typeProperties": {
 							"variableName": "infilefolder",
 							"value": {
-								"value": "@concat('datalake/data/lnd/', utcnow('yyyy_MM_dd_hh_mm_ss'))",
+								"value": "@utcnow('yyyy_MM_dd_hh_mm_ss')",
 								"type": "Expression"
 							}
 						}
@@ -332,7 +305,8 @@
 										"value": "@variables('infilefolder')",
 										"type": "Expression"
 									},
-									"infilename": "MelbParkingSensorData.json"
+									"infilename": "MelbParkingSensorData.json",
+									"container": "datalake/data/lnd"
 								}
 							}
 						]
@@ -385,7 +359,8 @@
 										"value": "@variables('infilefolder')",
 										"type": "Expression"
 									},
-									"infilename": "MelbParkingBayData.json"
+									"infilename": "MelbParkingBayData.json",
+									"container": "datalake/data/lnd"
 								}
 							}
 						]
