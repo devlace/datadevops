@@ -27,7 +27,7 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-# set -o xtrace # For debugging
+set -o xtrace # For debugging
 
 # Set path
 dir_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
@@ -79,4 +79,5 @@ databricks libraries install \
 
 # Upload notebooks to workspace
 echo "Uploading notebooks to workspace..."
-databricks workspace import_dir "notebooks" "/releases/release_${RELEASE_ID}/"
+# databricks workspace import_dir "notebooks" "/releases/release_${RELEASE_ID}/"
+databricks workspace import_dir "notebooks" "/notebooks/"
