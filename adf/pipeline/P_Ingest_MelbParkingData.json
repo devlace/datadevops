@@ -1,7 +1,6 @@
 {
 	"name": "P_Ingest_MelbParkingData",
 	"properties": {
-		"description": "test",
 		"activities": [
 			{
 				"name": "Transform and Load Melbourne Parking Data",
