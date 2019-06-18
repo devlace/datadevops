@@ -80,4 +80,4 @@ databricks libraries install \
 # Upload notebooks to workspace
 echo "Uploading notebooks to workspace..."
 # databricks workspace import_dir "notebooks" "/releases/release_${RELEASE_ID}/"
-databricks workspace import_dir "notebooks" "/notebooks/"
+databricks workspace import_dir -o "notebooks" "/notebooks/"
