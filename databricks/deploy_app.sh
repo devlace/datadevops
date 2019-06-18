@@ -46,7 +46,7 @@ cd "$dir_path"
 
 
 # Deploy clusters
-full_cluster_name=${CLUSTER_NAME}_${RELEASE_ID}
+full_cluster_name=${CLUSTER_NAME}
 cluster_config=$(cat ./config/cluster.config.template.json |
     sed "s~__REPLACE_CLUSTER_NAME__~${full_cluster_name}~g" |
     sed "s~__REPLACE_MOUNT_DATA_PATH__~${MOUNT_DATA_PATH}~g" |
@@ -79,4 +79,5 @@ databricks libraries install \
 
 # Upload notebooks to workspace
 echo "Uploading notebooks to workspace..."
-databricks workspace import_dir "notebooks" "/releases/release_${RELEASE_ID}/"
+# databricks workspace import_dir "notebooks" "/releases/release_${RELEASE_ID}/"
+databricks workspace import_dir "notebooks" "/notebooks/"
