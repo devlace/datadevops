@@ -41,6 +41,7 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "test",
 				"activities": [
 					{
 						"name": "Transform and Load Melbourne Parking Data",
@@ -373,7 +374,7 @@
 						},
 						"secretName": "dbricksToken"
 					},
-					"existingClusterId": "0310-082109-sappy184"
+					"existingClusterId": "0525-022815-shies412"
 				}
 			},
 			"dependsOn": [
