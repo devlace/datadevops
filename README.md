@@ -31,79 +31,19 @@ Both Build and Release Pipelines are built using [AzureDevOps](https://dev.azure
 - [Build Pipelines](https://dev.azure.com/devlacepub/DataDevOps/_build)
 - [Release Pipeline](https://dev.azure.com/devlacepub/DataDevOps/_release)
 
+More information [here](docs/CI_CD.md).
 ### Environments
 
-- **Dev** - Development collaboration branch which mirrors master branch
+- **Dev** - Development collaboration branch
 - **QA** - Environment where all integration tests are run
-- **Staging** - A mirror of the production job, along with state and data. Deploying to staging first give the ability to "mock" a realistic release into production.
+- **Staging/UAT** - A mirror of the production job, along with state and data. Deploying to staging first give the ability to "mock" a realistic release into production.
 - **Production**
 
 In addition to these environment, each developer may choose to have their own Development(s) environment for their individual use.
-
-### Build Pipelines
-
-1. **Build - Quality Assurance**
-  - Purpose: Ensure code quality and integrity
-  - Trigger: Pull Request to Master
-  - Steps:
-     1. Build Python packages
-     2. Run units tests 
-     3. Code Coverage
-     4. Linting
-2. **Build - Artifacts**
-  - Purpose: To produce necessary artifacts for Release
-  - Trigger: Commit to Master
-  - Steps:
-     1. Build and create Python Wheel
-     2. Publish artifacts:
-        - Python Wheel
-        - Databricks Notebooks and cluster configuration
-        - Data Factory pipeline definitions
-        - IaC - ARM templates, Bash scripts
-        - 3rd party library dependencies (JARs, etc)
-  
-### Release Pipelines
-
-Currently, there is one multi-stage release pipeline with the following stages. Each stage deploys to a different environment.
-  
-1. **On-demand Integration Testing (QA) environment** - **TODO**
-   1. Deploy Azure resources with ARM templates + Bash scripts
-   2. Store sensitive configuration information in shared QA KeyVault
-   3. Download integration test data from shared Storage to newly deployed ADAL Gen2.
-   4. Configure Databricks workspace
-      - Setup Data mount
-      - Create Databricks secrets
-   5. Deploy Data Application to Databricks
-      - Deploy cluster given configuration
-      - Upload Jars, Python wheels to DBFS
-      - Install libraries on cluster
-   6. Deploy ADF pipeline
-   7. Run integration tests
-      - Trigger ADF Pipeline
-      - Databricks job to run integration test notebook
-
-2. **Deploy to Staging**
-   - NOTE: *Staging environment should be a mirror of Production and thus already have a configured Databricks workspace (secrets, data mount, etc), ADAL Gen2, ADF Pipeline, KeyVault, etc.*
-   1. Hydrate data with latest production data
-   2. Deploy Data Application to Databricks
-      - Deploy cluster given configuration
-      - Upload Jars, Python wheels to DBFS
-      - Install libraries on cluster
-   3. Deploy ADF Pipeline and activate triggers
-   4. Run integration tests
-
-3. **Deploy to Production**
-   1. Deploy Data Application to Databricks
-      - Deploy cluster given configuration
-      - Upload Jars, Python wheels to DBFS
-      - Install libraries on cluster
-   2. Deploy ADF Pipeline
-   3. Swap between existing deployment and newly released deployment
-
  
 ## Testing
 
-- Unit Testing - Standard unit tests which tests small pieces of functionality within your code.
+- Unit Testing - Standard unit tests which tests small pieces of functionality within your code. Data transformation code should have unit tests.
 
 - Integration Testing - This includes end-to-end testing of the ETL pipeline.
 
@@ -113,15 +53,17 @@ Currently, there is one multi-stage release pipeline with the following stages. 
 
 ## Monitoring
 
-TODO
-
 ### Databricks
+- [Monitoring Azure Databricks with Azure Monitor](https://docs.microsoft.com/en-us/azure/architecture/databricks-monitoring/)
+- [Monitoring Azure Databricks Jobs with Application Insights](https://msdn.microsoft.com/en-us/magazine/mt846727.aspx)
 
 ### Data Factory
+- [Monitor Azure Data Factory with Azure Monitor](https://docs.microsoft.com/en-us/azure/data-factory/monitor-using-azure-monitor)
+- [Alerting in Azure Data Factory](https://azure.microsoft.com/en-in/blog/create-alerts-to-proactively-monitor-your-data-factory-pipelines/)
 
 ## Deploy the solution
 
-**IN PROGRESS**
+**WORK IN PROGRESS**
 
 To deploy the solution, 
 
