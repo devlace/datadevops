@@ -199,6 +199,7 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "Hello from Amsterdam!!",
 				"activities": [
 					{
 						"name": "Transform and Load Melbourne Parking Data",
