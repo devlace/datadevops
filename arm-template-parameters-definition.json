@@ -1,5 +1,16 @@
 {
     "Microsoft.DataFactory/factories/pipelines": {
+        "properties": {
+            "activities": [{
+                "typeProperties": {
+                    "waitTimeInSeconds": "-::number",
+                    "headers": "=::object",
+                    "libraries": [{
+                        "egg": "-:-eggPath"
+                    }]
+                }
+            }]
+        }
     },
     "Microsoft.DataFactory/factories/integrationRuntimes":{
         "properties": {
