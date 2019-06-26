@@ -9,7 +9,8 @@
 					"type": "PipelineReference"
 				},
 				"parameters": {
-					"transform_pythonegg_dbfspath": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+					"transform_pythonegg_dbfspath": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl",
+					"transform_notebook_path": "/notebooks/02_transform"
 				}
 			}
 		],

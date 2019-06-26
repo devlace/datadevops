@@ -28,7 +28,10 @@
 					"secureInput": false
 				},
 				"typeProperties": {
-					"notebookPath": "/notebooks/02_transform",
+					"notebookPath": {
+						"value": "@pipeline().parameters.transform_notebook_path",
+						"type": "Expression"
+					},
 					"baseParameters": {
 						"infilefolder": {
 							"value": "@variables('infilefolder')",
@@ -172,6 +175,10 @@
 			"transform_pythonegg_dbfspath": {
 				"type": "string",
 				"defaultValue": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+			},
+			"transform_notebook_path": {
+				"type": "string",
+				"defaultValue": "/notebooks/02_transform"
 			}
 		},
 		"variables": {
