@@ -3,7 +3,7 @@
         "properties": {
             "activities": [{
                 "typeProperties": {
-                    "notebookPath": "-"
+                    "notebookPath": "=::string"
                 }
             }]
         }
