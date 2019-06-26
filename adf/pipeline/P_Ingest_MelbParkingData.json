@@ -1,7 +1,6 @@
 {
 	"name": "P_Ingest_MelbParkingData",
 	"properties": {
-		"description": "Hello from Amsterdam!!",
 		"activities": [
 			{
 				"name": "Transform and Load Melbourne Parking Data",
@@ -39,7 +38,12 @@
 							"value": "@pipeline().RunId",
 							"type": "Expression"
 						}
-					}
+					},
+					"libraries": [
+						{
+							"egg": "@pipeline().parameters.transform_pythonegg_dbfspath"
+						}
+					]
 				},
 				"linkedServiceName": {
 					"referenceName": "Ls_adb_01",
@@ -162,43 +166,14 @@
 						}
 					}
 				]
-			},
-			{
-				"name": "Copy to SQLDB",
-				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Transform and Load Melbourne Parking Data",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"typeProperties": {
-					"source": {
-						"type": "AzureBlobFSSource",
-						"recursive": true
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "Ds_AdlsGen2_MelbParkingData",
-						"type": "DatasetReference",
-						"parameters": {
-							"container": "datalake/data/lnd"
-						}
-					}
-				]
 			}
 		],
+		"parameters": {
+			"transform_pythonegg_dbfspath": {
+				"type": "string",
+				"defaultValue": "dbfs ls dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+			}
+		},
 		"variables": {
 			"infilefolder": {
 				"type": "String",
