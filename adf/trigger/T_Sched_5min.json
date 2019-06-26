@@ -7,6 +7,9 @@
 				"pipelineReference": {
 					"referenceName": "P_Ingest_MelbParkingData",
 					"type": "PipelineReference"
+				},
+				"parameters": {
+					"transform_pythonegg_dbfspath": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
 				}
 			}
 		],
