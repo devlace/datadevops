@@ -3,9 +3,7 @@
         "properties": {
             "activities": [{
                 "typeProperties": {
-                    "waitTimeInSeconds": "-::number",
-                    "headers": "=::object",
-                    "notebookPath": "=",
+                    "notebookPath": "-",
                     "libraries": [{
                         "egg": "-:-eggPath"
                     }]
