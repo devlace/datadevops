@@ -3,9 +3,9 @@
         "properties": {
             "activities": [{
                 "typeProperties": {
-                    "notebookPath": "-",
+                    "notebookPath": "=",
                     "libraries": [{
-                        "egg": "-:-eggPath"
+                        "egg": "="
                     }]
                 }
             }]
