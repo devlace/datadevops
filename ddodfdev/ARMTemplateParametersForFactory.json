@@ -8,6 +8,12 @@
 		"Ls_Blob_connectionString": {
 			"value": ""
 		},
+		"P_Ingest_MelbParkingData_properties_0_typeProperties_notebookPath": {
+			"value": "/notebooks/02_transform"
+		},
+		"P_Ingest_MelbParkingData_properties_0_typeProperties_0_egg": {
+			"value": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+		},
 		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
 			"value": "@dataset().infilename"
 		},

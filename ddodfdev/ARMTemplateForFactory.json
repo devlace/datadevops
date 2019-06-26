@@ -11,6 +11,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Ls_Blob'"
 		},
+		"P_Ingest_MelbParkingData_properties_0_typeProperties_notebookPath": {
+			"type": "string",
+			"defaultValue": "/notebooks/02_transform"
+		},
+		"P_Ingest_MelbParkingData_properties_0_typeProperties_0_egg": {
+			"type": "string",
+			"defaultValue": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+		},
 		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
 			"type": "string",
 			"defaultValue": "@dataset().infilename"
@@ -73,7 +81,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"notebookPath": "/notebooks/02_transform",
+							"notebookPath": "[parameters('P_Ingest_MelbParkingData_properties_0_typeProperties_notebookPath')]",
 							"baseParameters": {
 								"infilefolder": {
 									"value": "@variables('infilefolder')",
@@ -86,7 +94,7 @@
 							},
 							"libraries": [
 								{
-									"egg": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+									"egg": "[parameters('P_Ingest_MelbParkingData_properties_0_typeProperties_0_egg')]"
 								}
 							]
 						},
