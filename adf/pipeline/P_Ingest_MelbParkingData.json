@@ -205,7 +205,8 @@
 		],
 		"parameters": {
 			"transform_pythonegg_dbfspath": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "dbfs ls dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
 			}
 		},
 		"variables": {
