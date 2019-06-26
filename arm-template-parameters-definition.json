@@ -5,6 +5,7 @@
                 "typeProperties": {
                     "waitTimeInSeconds": "-::number",
                     "headers": "=::object",
+                    "notebookPath": "=",
                     "libraries": [{
                         "egg": "-:-eggPath"
                     }]
