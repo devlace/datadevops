@@ -1,7 +1,6 @@
 {
 	"name": "P_Ingest_MelbParkingData",
 	"properties": {
-		"description": "Hello from Amsterdam!!",
 		"activities": [
 			{
 				"name": "Transform and Load Melbourne Parking Data",
@@ -39,7 +38,12 @@
 							"value": "@pipeline().RunId",
 							"type": "Expression"
 						}
-					}
+					},
+					"libraries": [
+						{
+							"egg": "@pipeline().parameters.transform_pythonegg_dbfspath"
+						}
+					]
 				},
 				"linkedServiceName": {
 					"referenceName": "Ls_adb_01",
@@ -164,6 +168,12 @@
 				]
 			}
 		],
+		"parameters": {
+			"transform_pythonegg_dbfspath": {
+				"type": "string",
+				"defaultValue": "dbfs ls dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+			}
+		},
 		"variables": {
 			"infilefolder": {
 				"type": "String",
