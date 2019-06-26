@@ -3,7 +3,10 @@
         "properties": {
             "activities": [{
                 "typeProperties": {
-                    "notebookPath": "=::string"
+                    "notebookPath": "=",
+                    "libraries": [{
+                        "egg": "="
+                    }]
                 }
             }]
         }
