@@ -28,10 +28,7 @@
 					"secureInput": false
 				},
 				"typeProperties": {
-					"notebookPath": {
-						"value": "@pipeline().parameters.transform_notebook_path",
-						"type": "Expression"
-					},
+					"notebookPath": "/notebooks/02_transform",
 					"baseParameters": {
 						"infilefolder": {
 							"value": "@variables('infilefolder')",
@@ -44,7 +41,7 @@
 					},
 					"libraries": [
 						{
-							"egg": "@pipeline().parameters.transform_pythonegg_dbfspath"
+							"egg": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
 						}
 					]
 				},
@@ -171,16 +168,6 @@
 				]
 			}
 		],
-		"parameters": {
-			"transform_pythonegg_dbfspath": {
-				"type": "string",
-				"defaultValue": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
-			},
-			"transform_notebook_path": {
-				"type": "string",
-				"defaultValue": "/notebooks/02_transform"
-			}
-		},
 		"variables": {
 			"infilefolder": {
 				"type": "String",
