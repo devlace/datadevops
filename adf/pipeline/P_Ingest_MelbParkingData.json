@@ -28,10 +28,7 @@
 					"secureInput": false
 				},
 				"typeProperties": {
-					"notebookPath": {
-						"value": "/notebooks/02_transform",
-						"type": "Expression"
-					},
+					"notebookPath": "/notebooks/02_transform",
 					"baseParameters": {
 						"infilefolder": {
 							"value": "@variables('infilefolder')",
