@@ -17,6 +17,9 @@
 		"Ls_AdlsGen2_01_properties_typeProperties_url": {
 			"value": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
 		},
+		"Ls_AzureSQLDb_properties_typeProperties_connectionString_secretName": {
+			"value": "sqlConnectionString"
+		},
 		"Ls_KeyVault_properties_typeProperties_baseUrl": {
 			"value": "https://ddokvdev4uuuxyu5.vault.azure.net/"
 		},

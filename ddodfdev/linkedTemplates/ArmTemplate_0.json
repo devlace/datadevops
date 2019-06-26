@@ -23,6 +23,10 @@
 			"type": "string",
 			"defaultValue": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
 		},
+		"Ls_AzureSQLDb_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "sqlConnectionString"
+		},
 		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
 			"type": "string",
 			"defaultValue": "@dataset().infilename"
@@ -129,6 +133,28 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Ls_AzureSQLDb')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Ls_KeyVault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('Ls_AzureSQLDb_properties_typeProperties_connectionString_secretName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ls_KeyVault')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Ls_adb_01')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -145,7 +171,12 @@
 						},
 						"secretName": "dbricksToken"
 					},
-					"existingClusterId": "0525-022815-shies412"
+					"newClusterNodeType": "Standard_DS3_v2",
+					"newClusterNumOfWorker": "1",
+					"newClusterSparkEnvVars": {
+						"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+					},
+					"newClusterVersion": "5.4.x-scala2.11"
 				}
 			},
 			"dependsOn": [
@@ -199,7 +230,6 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "Hello from Amsterdam!!",
 				"activities": [
 					{
 						"name": "Transform and Load Melbourne Parking Data",
@@ -238,7 +268,12 @@
 									"value": "@pipeline().RunId",
 									"type": "Expression"
 								}
-							}
+							},
+							"libraries": [
+								{
+									"egg": "@pipeline().parameters.transform_pythonegg_dbfspath"
+								}
+							]
 						},
 						"linkedServiceName": {
 							"referenceName": "Ls_adb_01",
@@ -367,6 +402,12 @@
 						]
 					}
 				],
+				"parameters": {
+					"transform_pythonegg_dbfspath": {
+						"type": "string",
+						"defaultValue": "dbfs ls dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+					}
+				},
 				"variables": {
 					"infilefolder": {
 						"type": "String",
@@ -387,7 +428,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Started",
+				"runtimeState": "Stopped",
 				"pipelines": [
 					{
 						"pipelineReference": {

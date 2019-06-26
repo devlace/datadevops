@@ -23,6 +23,10 @@
 			"type": "string",
 			"defaultValue": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
 		},
+		"Ls_AzureSQLDb_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "sqlConnectionString"
+		},
 		"Ls_KeyVault_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://ddokvdev4uuuxyu5.vault.azure.net/"
@@ -69,6 +73,9 @@
 					},
 					"Ls_AdlsGen2_01_properties_typeProperties_url": {
 						"value": "[parameters('Ls_AdlsGen2_01_properties_typeProperties_url')]"
+					},
+					"Ls_AzureSQLDb_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('Ls_AzureSQLDb_properties_typeProperties_connectionString_secretName')]"
 					},
 					"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
 						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName')]"

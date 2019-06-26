@@ -6,34 +6,6 @@
 			"type": "string",
 			"metadata": "Data Factory Name",
 			"defaultValue": "ddodfdev"
-		},
-		"Ls_Blob_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'Ls_Blob'"
-		},
-		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName": {
-			"type": "string",
-			"defaultValue": "@dataset().infilename"
-		},
-		"Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath": {
-			"type": "string",
-			"defaultValue": "@concat(dataset().container, '/', dataset().infilefolder)"
-		},
-		"Ls_AdlsGen2_01_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://ddostordev4uuuxyu5.dfs.core.windows.net/"
-		},
-		"Ls_AzureSQLDb_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "sqlConnectionString"
-		},
-		"Ls_KeyVault_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://ddokvdev4uuuxyu5.vault.azure.net/"
-		},
-		"Ls_Rest_MelParkSensors_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://data.melbourne.vic.gov.au/resource/"
 		}
 	},
 	"variables": {
@@ -71,7 +43,6 @@
 							"secureOutput": false,
 							"secureInput": false
 						},
-						"userProperties": [],
 						"typeProperties": {
 							"notebookPath": "/notebooks/02_transform",
 							"baseParameters": {
@@ -98,8 +69,6 @@
 					{
 						"name": "Set infilefolder",
 						"type": "SetVariable",
-						"dependsOn": [],
-						"userProperties": [],
 						"typeProperties": {
 							"variableName": "infilefolder",
 							"value": {
@@ -126,7 +95,6 @@
 							"secureOutput": false,
 							"secureInput": false
 						},
-						"userProperties": [],
 						"typeProperties": {
 							"source": {
 								"type": "RestSource",
@@ -180,7 +148,6 @@
 							"secureOutput": false,
 							"secureInput": false
 						},
-						"userProperties": [],
 						"typeProperties": {
 							"source": {
 								"type": "RestSource",
@@ -228,106 +195,10 @@
 						"type": "String",
 						"defaultValue": "lnd"
 					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ls_adb_01')]",
-				"[concat(variables('factoryId'), '/datasets/Ds_REST_MelbParkingData')]",
-				"[concat(variables('factoryId'), '/datasets/Ds_AdlsGen2_MelbParkingData')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ds_AdlsGen2_MelbParkingData')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Ls_AdlsGen2_01",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"infilefolder": {
-						"type": "String"
-					},
-					"infilename": {
-						"type": "String"
-					},
-					"container": {
-						"type": "String",
-						"defaultValue": "datalake/data/lnd"
-					}
-				},
-				"annotations": [],
-				"type": "AzureBlobFSFile",
-				"typeProperties": {
-					"format": {
-						"type": "JsonFormat",
-						"filePattern": "arrayOfObjects"
-					},
-					"fileName": {
-						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_fileName')]",
-						"type": "Expression"
-					},
-					"folderPath": {
-						"value": "[parameters('Ds_AdlsGen2_MelbParkingData_properties_typeProperties_folderPath')]",
-						"type": "Expression"
-					}
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ls_AdlsGen2_01')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ds_REST_MelbParkingData')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Ls_Rest_MelParkSensors",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"relativeurl": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {
-					"relativeUrl": {
-						"value": "@dataset().relativeurl",
-						"type": "Expression"
-					},
-					"requestMethod": "GET"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ls_Rest_MelParkSensors')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ls_AdlsGen2_01')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('Ls_AdlsGen2_01_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "Ls_KeyVault",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "storageKey"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ls_KeyVault')]"
+				"[concat(variables('factoryId'), '/linkedServices/Ls_adb_01')]"
 			]
 		},
 		{
@@ -335,7 +206,6 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"annotations": [],
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
 					"connectionString": {
@@ -344,61 +214,16 @@
 							"referenceName": "Ls_KeyVault",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "[parameters('Ls_AzureSQLDb_properties_typeProperties_connectionString_secretName')]"
+						"secretName": "sqlConnectionString"
 					}
 				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ls_KeyVault')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ls_Blob')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('Ls_Blob_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ls_KeyVault')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('Ls_KeyVault_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ls_Rest_MelParkSensors')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "RestService",
-				"typeProperties": {
-					"url": "[parameters('Ls_Rest_MelParkSensors_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "Anonymous"
-				}
-			},
-			"dependsOn": []
+			}
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Ls_adb_01')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"annotations": [],
 				"type": "AzureDatabricks",
 				"typeProperties": {
 					"domain": "https://australiaeast.azuredatabricks.net",
@@ -417,25 +242,20 @@
 					},
 					"newClusterVersion": "5.4.x-scala2.11"
 				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ls_KeyVault')]"
-			]
+			}
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/T_Sched_5min')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"annotations": [],
 				"runtimeState": "Stopped",
 				"pipelines": [
 					{
 						"pipelineReference": {
 							"referenceName": "P_Ingest_MelbParkingData",
 							"type": "PipelineReference"
-						},
-						"parameters": {}
+						}
 					}
 				],
 				"type": "ScheduleTrigger",
