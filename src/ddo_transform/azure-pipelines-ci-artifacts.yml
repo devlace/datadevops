@@ -13,7 +13,7 @@ trigger:
 
 variables:
   WORKING_DIR: 'src/ddo_transform'
-  ARTIFACTS_FEED_NAME: devlacepub
+  ARTIFACTS_FEED_NAME: DataDevOpsFeed
   PACKAGE_MAJOR_VERSION:  1
   PACKAGE_MINOR_VERSION:  1
   PACKAGE_PATCH_VERSION:  $(Build.BuildId)
@@ -55,8 +55,24 @@ steps:
     artifactFeeds: $(ARTIFACTS_FEED_NAME)
   displayName: 'Authenticate to artifact feed'
 
-- script: cat $(PYPIRC_PATH)
-
 - script: twine upload -r $(ARTIFACTS_FEED_NAME) --config-file $(PYPIRC_PATH) dist/*
   displayName: 'upload to artifact feed'
   workingDirectory: $(WORKING_DIR)
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(WORKING_DIR)/dist'
+    ArtifactName: 'dist'
+  displayName: 'Publish Dist Artifacts'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'databricks'
+    ArtifactName: 'databricks'
+  displayName: 'Publish Databricks Artifacts'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'adf/_scripts/deploymentadf.ps1'
+    ArtifactName: 'adf_scripts'
+  displayName: 'Publish ADF Scripts'
