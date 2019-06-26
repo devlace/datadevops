@@ -3,10 +3,7 @@
         "properties": {
             "activities": [{
                 "typeProperties": {
-                    "notebookPath": "-",
-                    "libraries": [{
-                        "egg": "-:-eggPath"
-                    }]
+                    "notebookPath": "-"
                 }
             }]
         }
