@@ -39,6 +39,10 @@
 			"type": "string",
 			"defaultValue": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
 		},
+		"T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_notebook_path": {
+			"type": "string",
+			"defaultValue": "/notebooks/02_transform"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -89,6 +93,9 @@
 					},
 					"T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_pythonegg_dbfspath": {
 						"value": "[parameters('T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_pythonegg_dbfspath')]"
+					},
+					"T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_notebook_path": {
+						"value": "[parameters('T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_notebook_path')]"
 					}
 				}
 			},

@@ -38,6 +38,10 @@
 		"T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_pythonegg_dbfspath": {
 			"type": "string",
 			"defaultValue": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+		},
+		"T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_notebook_path": {
+			"type": "string",
+			"defaultValue": "/notebooks/02_transform"
 		}
 	},
 	"variables": {
@@ -77,7 +81,10 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"notebookPath": "/notebooks/02_transform",
+							"notebookPath": {
+								"value": "@pipeline().parameters.transform_notebook_path",
+								"type": "Expression"
+							},
 							"baseParameters": {
 								"infilefolder": {
 									"value": "@variables('infilefolder')",
@@ -225,6 +232,10 @@
 					"transform_pythonegg_dbfspath": {
 						"type": "string",
 						"defaultValue": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+					},
+					"transform_notebook_path": {
+						"type": "string",
+						"defaultValue": "/notebooks/02_transform"
 					}
 				},
 				"variables": {
@@ -440,7 +451,8 @@
 							"type": "PipelineReference"
 						},
 						"parameters": {
-							"transform_pythonegg_dbfspath": "[parameters('T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_pythonegg_dbfspath')]"
+							"transform_pythonegg_dbfspath": "[parameters('T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_pythonegg_dbfspath')]",
+							"transform_notebook_path": "[parameters('T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_notebook_path')]"
 						}
 					}
 				],
