@@ -34,6 +34,10 @@
 		"Ls_Rest_MelParkSensors_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://data.melbourne.vic.gov.au/resource/"
+		},
+		"T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_pythonegg_dbfspath": {
+			"type": "string",
+			"defaultValue": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
 		}
 	},
 	"variables": {
@@ -220,7 +224,7 @@
 				"parameters": {
 					"transform_pythonegg_dbfspath": {
 						"type": "string",
-						"defaultValue": "dbfs ls dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+						"defaultValue": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
 					}
 				},
 				"variables": {
@@ -435,7 +439,9 @@
 							"referenceName": "P_Ingest_MelbParkingData",
 							"type": "PipelineReference"
 						},
-						"parameters": {}
+						"parameters": {
+							"transform_pythonegg_dbfspath": "[parameters('T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_pythonegg_dbfspath')]"
+						}
 					}
 				],
 				"type": "ScheduleTrigger",
