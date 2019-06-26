@@ -25,12 +25,6 @@
 		},
 		"Ls_Rest_MelParkSensors_properties_typeProperties_url": {
 			"value": "https://data.melbourne.vic.gov.au/resource/"
-		},
-		"T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_pythonegg_dbfspath": {
-			"value": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
-		},
-		"T_Sched_5min_properties_P_Ingest_MelbParkingData_parameters_transform_notebook_path": {
-			"value": "/notebooks/02_transform"
 		}
 	}
 }

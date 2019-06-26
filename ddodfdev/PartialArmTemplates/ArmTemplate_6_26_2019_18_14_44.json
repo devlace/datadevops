@@ -1,0 +1,224 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory Name",
+			"defaultValue": "ddodfdev"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/P_Ingest_MelbParkingData')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Transform and Load Melbourne Parking Data",
+						"description": "",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "DownloadSensorData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DownloadBayData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"typeProperties": {
+							"notebookPath": "/notebooks/02_transform",
+							"baseParameters": {
+								"infilefolder": {
+									"value": "@variables('infilefolder')",
+									"type": "Expression"
+								},
+								"loadid": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							},
+							"libraries": [
+								{
+									"egg": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "Ls_adb_01",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Set infilefolder",
+						"type": "SetVariable",
+						"typeProperties": {
+							"variableName": "infilefolder",
+							"value": {
+								"value": "@utcnow('yyyy_MM_dd_hh_mm_ss')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "DownloadSensorData",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Set infilefolder",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010"
+							},
+							"sink": {
+								"type": "AzureBlobFSSink"
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Ds_REST_MelbParkingData",
+								"type": "DatasetReference",
+								"parameters": {
+									"relativeurl": "dtpv-d4pf.json"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Ds_AdlsGen2_MelbParkingData",
+								"type": "DatasetReference",
+								"parameters": {
+									"infilefolder": {
+										"value": "@variables('infilefolder')",
+										"type": "Expression"
+									},
+									"infilename": "MelbParkingSensorData.json",
+									"container": "datalake/data/lnd"
+								}
+							}
+						]
+					},
+					{
+						"name": "DownloadBayData",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Set infilefolder",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010"
+							},
+							"sink": {
+								"type": "AzureBlobFSSink"
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Ds_REST_MelbParkingData",
+								"type": "DatasetReference",
+								"parameters": {
+									"relativeurl": "wuf8-susg.json"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Ds_AdlsGen2_MelbParkingData",
+								"type": "DatasetReference",
+								"parameters": {
+									"infilefolder": {
+										"value": "@variables('infilefolder')",
+										"type": "Expression"
+									},
+									"infilename": "MelbParkingBayData.json",
+									"container": "datalake/data/lnd"
+								}
+							}
+						]
+					}
+				],
+				"variables": {
+					"infilefolder": {
+						"type": "String",
+						"defaultValue": "lnd"
+					}
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/T_Sched_5min')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "P_Ingest_MelbParkingData",
+							"type": "PipelineReference"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 5,
+						"startTime": "2019-02-01T05:28:00.000Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/P_Ingest_MelbParkingData')]"
+			]
+		}
+	]
+}
