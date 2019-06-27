@@ -1,7 +1,7 @@
 -- Databricks notebook source
-CREATE SCHEMA dw;
-CREATE SCHEMA lnd;
-CREATE SCHEMA interim;
+CREATE SCHEMA IF NOT EXISTS dw;
+CREATE SCHEMA IF NOT EXISTS lnd;
+CREATE SCHEMA IF NOT EXISTS interim;
 
 -- COMMAND ----------
 
@@ -25,7 +25,9 @@ CREATE TABLE dw.fact_parking (
   loaded_on TIMESTAMP
 )
 USING parquet
-LOCATION '/mnt/datalake/data/dw/fact_parking/'
+LOCATION '/mnt/datalake/data/dw/fact_parking/';
+
+REFRESH TABLE dw.fact_parking;
 
 -- COMMAND ----------
 
@@ -36,7 +38,9 @@ CREATE TABLE dw.dim_st_marker (
   loaded_on TIMESTAMP
 )
 USING parquet
-LOCATION '/mnt/datalake/data/dw/dim_st_marker/'
+LOCATION '/mnt/datalake/data/dw/dim_st_marker/';
+
+REFRESH TABLE dw.dim_st_marker;
 
 -- COMMAND ----------
 
@@ -49,7 +53,9 @@ CREATE TABLE dw.dim_location (
   loaded_on TIMESTAMP
 )
 USING parquet
-LOCATION '/mnt/datalake/data/dw/dim_location/'
+LOCATION '/mnt/datalake/data/dw/dim_location/';
+
+REFRESH TABLE dw.dim_location;
 
 -- COMMAND ----------
 
@@ -65,7 +71,9 @@ CREATE TABLE dw.dim_parking_bay (
   loaded_on TIMESTAMP
 )
 USING parquet
-LOCATION '/mnt/datalake/data/dw/dim_parking_bay/'
+LOCATION '/mnt/datalake/data/dw/dim_parking_bay/';
+
+REFRESH TABLE dw.dim_parking_bay;
 
 -- COMMAND ----------
 
@@ -74,15 +82,16 @@ LOCATION '/mnt/datalake/data/dw/dim_parking_bay/'
 -- MAGIC 
 -- MAGIC # DimDate
 -- MAGIC dimdate = spark.read.csv("dbfs:/mnt/datalake/data/seed/DimDate.csv", header=True)
--- MAGIC dimdate.write.saveAsTable("dim_date")
+-- MAGIC dimdate.write.saveAsTable("dw.dim_date")
 -- MAGIC 
 -- MAGIC # DimTime
 -- MAGIC dimtime = spark.read.csv("dbfs:/mnt/datalake/data/seed/DimTime.csv", header=True)
 -- MAGIC dimtime = dimtime.select(dimtime["second_of_day"].alias("dim_time_id"), col("*"))
--- MAGIC dimtime.write.saveAsTable("dim_time")
+-- MAGIC dimtime.write.saveAsTable("dw.dim_time")
 
 -- COMMAND ----------
 
+DROP TABLE IF EXISTS interim.parking_bay;
 CREATE TABLE interim.parking_bay (
   bay_id INT,
   `last_edit` TIMESTAMP,
@@ -95,7 +104,9 @@ CREATE TABLE interim.parking_bay (
   loaded_on TIMESTAMP
 )
 USING parquet
-LOCATION '/mnt/datalake/data/interim/parking_bay/'
+LOCATION '/mnt/datalake/data/interim/parking_bay/';
+
+REFRESH TABLE interim.parking_bay;
 
 -- COMMAND ----------
 
@@ -103,12 +114,14 @@ DROP TABLE IF EXISTS interim.sensor;
 CREATE TABLE interim.sensor (
   bay_id INT,
   `st_marker_id` STRING,
-  `lat` TIMESTAMP,
-  `lon` STRING, 
+  `lat` FLOAT,
+  `lon` FLOAT, 
   `location` STRUCT<`coordinates`: ARRAY<DOUBLE>, `type`: STRING>, 
   `status` STRING, 
   load_id STRING,
   loaded_on TIMESTAMP
 )
 USING parquet
-LOCATION '/mnt/datalake/data/interim/sensors/'
+LOCATION '/mnt/datalake/data/interim/sensors/';
+
+REFRESH TABLE interim.sensor;
