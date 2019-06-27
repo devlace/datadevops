@@ -1,14 +1,20 @@
 -- Databricks notebook source
-DROP TABLE IF EXISTS fact_parking;
-DROP TABLE IF EXISTS dim_st_marker;
-DROP TABLE IF EXISTS dim_location;
-DROP TABLE IF EXISTS dim_parking_bay;
-DROP TABLE IF EXISTS dim_date;
-DROP TABLE IF EXISTS dim_time;
+CREATE SCHEMA dw;
+CREATE SCHEMA lnd;
+CREATE SCHEMA interim;
 
 -- COMMAND ----------
 
-CREATE TABLE fact_parking (
+DROP TABLE IF EXISTS dw.fact_parking;
+DROP TABLE IF EXISTS dw.dim_st_marker;
+DROP TABLE IF EXISTS dw.dim_location;
+DROP TABLE IF EXISTS dw.dim_parking_bay;
+DROP TABLE IF EXISTS dw.dim_date;
+DROP TABLE IF EXISTS dw.dim_time;
+
+-- COMMAND ----------
+
+CREATE TABLE dw.fact_parking (
   dim_date_id STRING,
   dim_time_id STRING,
   dim_parking_bay_id STRING,
@@ -18,21 +24,23 @@ CREATE TABLE fact_parking (
   load_id STRING,
   loaded_on TIMESTAMP
 )
-USING delta
+USING parquet
+LOCATION '/mnt/datalake/data/dw/fact_parking/'
 
 -- COMMAND ----------
 
-CREATE TABLE dim_st_marker (
+CREATE TABLE dw.dim_st_marker (
   dim_st_marker_id STRING,
   st_marker_id STRING,
   load_id STRING,
   loaded_on TIMESTAMP
 )
-USING delta
+USING parquet
+LOCATION '/mnt/datalake/data/dw/dim_st_marker/'
 
 -- COMMAND ----------
 
-CREATE TABLE dim_location (
+CREATE TABLE dw.dim_location (
   dim_location_id STRING,
   `location` STRUCT<`coordinates`: ARRAY<DOUBLE>, `type`: STRING>,
   lat FLOAT,
@@ -40,11 +48,12 @@ CREATE TABLE dim_location (
   load_id STRING,
   loaded_on TIMESTAMP
 )
-USING delta
+USING parquet
+LOCATION '/mnt/datalake/data/dw/dim_location/'
 
 -- COMMAND ----------
 
-CREATE TABLE dim_parking_bay (
+CREATE TABLE dw.dim_parking_bay (
   dim_parking_bay_id STRING,
   bay_id STRING,
   `marker_id` STRING, 
@@ -55,7 +64,8 @@ CREATE TABLE dim_parking_bay (
   load_id STRING,
   loaded_on TIMESTAMP
 )
-USING delta
+USING parquet
+LOCATION '/mnt/datalake/data/dw/dim_parking_bay/'
 
 -- COMMAND ----------
 
@@ -73,3 +83,32 @@ USING delta
 
 -- COMMAND ----------
 
+CREATE TABLE interim.parking_bay (
+  bay_id INT,
+  `last_edit` TIMESTAMP,
+  `marker_id` STRING, 
+  `meter_id` STRING, 
+  `rd_seg_dsc` STRING, 
+  `rd_seg_id` STRING, 
+  `the_geom` STRUCT<`coordinates`: ARRAY<ARRAY<ARRAY<ARRAY<DOUBLE>>>>, `type`: STRING>,
+  load_id STRING,
+  loaded_on TIMESTAMP
+)
+USING parquet
+LOCATION '/mnt/datalake/data/interim/parking_bay/'
+
+-- COMMAND ----------
+
+DROP TABLE IF EXISTS interim.sensor;
+CREATE TABLE interim.sensor (
+  bay_id INT,
+  `st_marker_id` STRING,
+  `lat` TIMESTAMP,
+  `lon` STRING, 
+  `location` STRUCT<`coordinates`: ARRAY<DOUBLE>, `type`: STRING>, 
+  `status` STRING, 
+  load_id STRING,
+  loaded_on TIMESTAMP
+)
+USING parquet
+LOCATION '/mnt/datalake/data/interim/sensors/'
