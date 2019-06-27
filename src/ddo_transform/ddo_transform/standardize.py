@@ -32,8 +32,8 @@ def standardize_sensordata(sensordata_sdf: DataFrame, load_id, loaded_on):
         .select(
             col("bay_id").cast("int").alias("bay_id"),
             "st_marker_id",
-            "lat",
-            "lon",
+            col("lat").cast("float").alias("lat"),
+            col("lon").cast("float").alias("lon"),
             "location",
             "status",
             lit(load_id).alias("load_id"),
