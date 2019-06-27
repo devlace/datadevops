@@ -13,9 +13,17 @@
 		},
 		"P_Ingest_MelbParkingData_properties_0_typeProperties_notebookPath": {
 			"type": "string",
-			"defaultValue": "/notebooks/02_transform"
+			"defaultValue": "/notebooks/02_standardize"
 		},
 		"P_Ingest_MelbParkingData_properties_0_typeProperties_0_egg": {
+			"type": "string",
+			"defaultValue": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+		},
+		"P_Ingest_MelbParkingData_properties_4_typeProperties_notebookPath": {
+			"type": "string",
+			"defaultValue": "/notebooks/03_transform"
+		},
+		"P_Ingest_MelbParkingData_properties_4_typeProperties_0_egg": {
 			"type": "string",
 			"defaultValue": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
 		},
@@ -55,7 +63,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Transform and Load Melbourne Parking Data",
+						"name": "StandardizeData",
 						"description": "",
 						"type": "DatabricksNotebook",
 						"dependsOn": [
@@ -223,6 +231,44 @@
 								}
 							}
 						]
+					},
+					{
+						"name": "TransformLoad_DatabricksDelta",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "StandardizeData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "[parameters('P_Ingest_MelbParkingData_properties_4_typeProperties_notebookPath')]",
+							"baseParameters": {
+								"loadid": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							},
+							"libraries": [
+								{
+									"egg": "[parameters('P_Ingest_MelbParkingData_properties_4_typeProperties_0_egg')]"
+								}
+							]
+						},
+						"linkedServiceName": {
+							"referenceName": "Ls_adb_01",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"variables": {
