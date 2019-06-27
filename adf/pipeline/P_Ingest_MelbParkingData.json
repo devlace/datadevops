@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Transform and Load Melbourne Parking Data",
+				"name": "StandardizeData",
 				"description": "",
 				"type": "DatabricksNotebook",
 				"dependsOn": [
@@ -28,7 +28,7 @@
 					"secureInput": false
 				},
 				"typeProperties": {
-					"notebookPath": "/notebooks/02_transform",
+					"notebookPath": "/notebooks/02_standardize",
 					"baseParameters": {
 						"infilefolder": {
 							"value": "@variables('infilefolder')",
@@ -166,6 +166,43 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "TransformLoad_DatabricksDelta",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "StandardizeData",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"notebookPath": "/notebooks/03_transform",
+					"baseParameters": {
+						"loadid": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						}
+					},
+					"libraries": [
+						{
+							"egg": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+						}
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "Ls_adb_01",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"variables": {
