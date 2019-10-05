@@ -32,7 +32,7 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-set -o xtrace # For debugging
+# set -o xtrace # For debugging
 
 ################
 # PARAMETERS
