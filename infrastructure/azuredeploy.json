@@ -45,6 +45,13 @@
             "metadata": {
                 "description": "Service Principal to be granted access to Storage Account - ADLA Gen2"
             }
+        },
+        "adfName": {
+            "defaultValue": "[concat(parameters('deployNs'), 'adf', parameters('env'), substring(uniqueString(resourceGroup().id), 0, 8))]",
+            "type": "string",
+            "metadata": {
+                "description": "Data Factory Name"
+            }
         }
     },
     "variables": {
@@ -93,6 +100,14 @@
                             "All"
                         ]
                     }
+                }, {
+                    "tenantId": "[subscription().tenantId]",
+                    "objectId": "[reference(parameters('adfName'), '2018-06-01', 'Full').identity.principalId]",
+                    "permissions": {
+                        "secrets": [
+                            "get", "list"
+                        ]
+                    }
                 }],
                 "sku": {
                     "family": "A",
@@ -138,6 +153,20 @@
                 "accessTier": "Hot"
             },
             "dependsOn": []
+        },
+        {
+            "apiVersion": "2018-06-01",
+            "name": "[parameters('adfName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "DataFactory",
+                "Environment": "[parameters('env')]"
+            },
+            "type": "Microsoft.DataFactory/factories",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {}
         }
     ],
     "outputs": {

@@ -1,8 +1,8 @@
 {
     "run_name": "Setup workspace",
     "new_cluster": {
-        "spark_version": "5.1.x-scala2.11",
-        "node_type_id": "Standard_DS12_v2",
+        "spark_version": "5.5.x-scala2.11",
+        "node_type_id": "Standard_DS3_v2",
         "num_workers": 1,
         "spark_env_vars": {
             "PYSPARK_PYTHON": "/databricks/python3/bin/python3",

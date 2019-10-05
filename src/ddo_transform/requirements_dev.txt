@@ -8,6 +8,5 @@ coverage
 Sphinx
 twine
 click
-
 pytest
 pytest-runner
