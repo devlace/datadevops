@@ -52,6 +52,10 @@ storage_account_id=$(az storage account show \
     --output json |
     jq -r '.id')
 
+# See this issue: https://github.com/Azure/azure-powershell/issues/2286
+# TODO: make more robust
+sleep 1m 
+
 # Grant "Storage Blob Data Owner (Preview)
 echo "Granting 'Storage Blob Data Contributor' for '$storage_account' to SP"
 az role assignment create --assignee "$sp_stor_id" \
@@ -64,6 +68,10 @@ az role assignment create --assignee "$sp_stor_id" \
 #
 # For information on calling Azure REST API, see here: 
 # https://docs.microsoft.com/en-us/rest/api/azure/
+
+# It takes time for AD permissions to propogate
+# TODO: make more robust
+sleep 1m
 
 # Use service principle to generate bearer token
 bearer_token=$(curl -X POST -d "grant_type=client_credentials&client_id=${sp_stor_id}&client_secret=${sp_stor_pass}&resource=https%3A%2F%2Fstorage.azure.com%2F" \

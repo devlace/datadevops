@@ -23,8 +23,8 @@ set -o nounset
 # set -o xtrace # For debugging
 
 # Set path
-dir_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-cd "$dir_path"
+parent_dir=$(pwd -P)
+dir_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P ); cd "$dir_path"
 
 # Constants
 RED='\033[0;31m'
@@ -112,3 +112,7 @@ _main() {
 }
 
 _main
+
+
+echo "Return to parent script dir: $parent_dir"
+cd "$parent_dir"

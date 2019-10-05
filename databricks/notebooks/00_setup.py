@@ -1,4 +1,9 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC ## Mount ADLS Gen2
+
+# COMMAND ----------
+
 import os
 
 # Set mount path
@@ -36,3 +41,162 @@ dbutils.fs.mount(
 
 # Refresh mounts
 dbutils.fs.refreshMounts()
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Create Tables
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC CREATE SCHEMA IF NOT EXISTS dw;
+# MAGIC CREATE SCHEMA IF NOT EXISTS lnd;
+# MAGIC CREATE SCHEMA IF NOT EXISTS interim;
+# MAGIC 
+# MAGIC DROP TABLE IF EXISTS dw.fact_parking;
+# MAGIC DROP TABLE IF EXISTS dw.dim_st_marker;
+# MAGIC DROP TABLE IF EXISTS dw.dim_location;
+# MAGIC DROP TABLE IF EXISTS dw.dim_parking_bay;
+# MAGIC DROP TABLE IF EXISTS dw.dim_date;
+# MAGIC DROP TABLE IF EXISTS dw.dim_time;
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC -- FACT tables
+# MAGIC CREATE TABLE dw.fact_parking (
+# MAGIC   dim_date_id STRING,
+# MAGIC   dim_time_id STRING,
+# MAGIC   dim_parking_bay_id STRING,
+# MAGIC   dim_location_id STRING,
+# MAGIC   dim_st_marker_id STRING,
+# MAGIC   status STRING,
+# MAGIC   load_id STRING,
+# MAGIC   loaded_on TIMESTAMP
+# MAGIC )
+# MAGIC USING parquet
+# MAGIC LOCATION '/mnt/datalake/data/dw/fact_parking/';
+# MAGIC 
+# MAGIC REFRESH TABLE dw.fact_parking;
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC -- DIMENSION tables
+# MAGIC CREATE TABLE dw.dim_st_marker (
+# MAGIC   dim_st_marker_id STRING,
+# MAGIC   st_marker_id STRING,
+# MAGIC   load_id STRING,
+# MAGIC   loaded_on TIMESTAMP
+# MAGIC )
+# MAGIC USING parquet
+# MAGIC LOCATION '/mnt/datalake/data/dw/dim_st_marker/';
+# MAGIC 
+# MAGIC REFRESH TABLE dw.dim_st_marker;
+# MAGIC 
+# MAGIC --
+# MAGIC CREATE TABLE dw.dim_location (
+# MAGIC   dim_location_id STRING,
+# MAGIC   `location` STRUCT<`coordinates`: ARRAY<DOUBLE>, `type`: STRING>,
+# MAGIC   lat FLOAT,
+# MAGIC   lon FLOAT,
+# MAGIC   load_id STRING,
+# MAGIC   loaded_on TIMESTAMP
+# MAGIC )
+# MAGIC USING parquet
+# MAGIC LOCATION '/mnt/datalake/data/dw/dim_location/';
+# MAGIC 
+# MAGIC REFRESH TABLE dw.dim_location;
+# MAGIC 
+# MAGIC --
+# MAGIC CREATE TABLE dw.dim_parking_bay (
+# MAGIC   dim_parking_bay_id STRING,
+# MAGIC   bay_id STRING,
+# MAGIC   `marker_id` STRING, 
+# MAGIC   `meter_id` STRING, 
+# MAGIC   `rd_seg_dsc` STRING, 
+# MAGIC   `rd_seg_id` STRING, 
+# MAGIC   `the_geom` STRUCT<`coordinates`: ARRAY<ARRAY<ARRAY<ARRAY<DOUBLE>>>>, `type`: STRING>,
+# MAGIC   load_id STRING,
+# MAGIC   loaded_on TIMESTAMP
+# MAGIC )
+# MAGIC USING parquet
+# MAGIC LOCATION '/mnt/datalake/data/dw/dim_parking_bay/';
+# MAGIC 
+# MAGIC REFRESH TABLE dw.dim_parking_bay;
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC DROP TABLE IF EXISTS dim.dim_date;
+# MAGIC DROP TABLE IF EXISTS dim.dim_time;
+
+# COMMAND ----------
+
+from pyspark.sql.functions import col
+import os
+from urllib.request import urlretrieve
+
+def download_url(url, filename):
+  # Create dir if not exist
+  dir_path = os.path.dirname(filename)
+  if not os.path.exists(dir_path):
+    os.makedirs(dir_path)
+  urlretrieve(url, filename)
+
+# Download data
+download_url("https://lacedemodata.blob.core.windows.net/data/DimDate.csv", "/dbfs/mnt/datalake/data/seed/DimDate.csv")
+download_url("https://lacedemodata.blob.core.windows.net/data/DimTime.csv", "/dbfs/mnt/datalake/data/seed/DimTime.csv")
+
+# DimDate
+dimdate = spark.read.csv("dbfs:/mnt/datalake/data/seed/DimDate.csv", header=True)
+dimdate.write.saveAsTable("dw.dim_date")
+
+# DimTime
+dimtime = spark.read.csv("dbfs:/mnt/datalake/data/seed/DimTime.csv", header=True)
+dimtime = dimtime.select(dimtime["second_of_day"].alias("dim_time_id"), col("*"))
+dimtime.write.saveAsTable("dw.dim_time")
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC -- INTERIM tables
+# MAGIC 
+# MAGIC DROP TABLE IF EXISTS interim.parking_bay;
+# MAGIC CREATE TABLE interim.parking_bay (
+# MAGIC   bay_id INT,
+# MAGIC   `last_edit` TIMESTAMP,
+# MAGIC   `marker_id` STRING, 
+# MAGIC   `meter_id` STRING, 
+# MAGIC   `rd_seg_dsc` STRING, 
+# MAGIC   `rd_seg_id` STRING, 
+# MAGIC   `the_geom` STRUCT<`coordinates`: ARRAY<ARRAY<ARRAY<ARRAY<DOUBLE>>>>, `type`: STRING>,
+# MAGIC   load_id STRING,
+# MAGIC   loaded_on TIMESTAMP
+# MAGIC )
+# MAGIC USING parquet
+# MAGIC LOCATION '/mnt/datalake/data/interim/parking_bay/';
+# MAGIC 
+# MAGIC REFRESH TABLE interim.parking_bay;
+# MAGIC 
+# MAGIC --
+# MAGIC DROP TABLE IF EXISTS interim.sensor;
+# MAGIC CREATE TABLE interim.sensor (
+# MAGIC   bay_id INT,
+# MAGIC   `st_marker_id` STRING,
+# MAGIC   `lat` FLOAT,
+# MAGIC   `lon` FLOAT, 
+# MAGIC   `location` STRUCT<`coordinates`: ARRAY<DOUBLE>, `type`: STRING>, 
+# MAGIC   `status` STRING, 
+# MAGIC   load_id STRING,
+# MAGIC   loaded_on TIMESTAMP
+# MAGIC )
+# MAGIC USING parquet
+# MAGIC LOCATION '/mnt/datalake/data/interim/sensors/';
+# MAGIC 
+# MAGIC REFRESH TABLE interim.sensor;
+
+# COMMAND ----------
+
+
