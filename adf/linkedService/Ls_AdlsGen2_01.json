@@ -1,9 +1,10 @@
 {
 	"name": "Ls_AdlsGen2_01",
 	"properties": {
+		"annotations": [],
 		"type": "AzureBlobFS",
 		"typeProperties": {
-			"url": "https://ddostordev4uuuxyu5.dfs.core.windows.net/",
+			"url": "https://ddostorstgevrxezhv.dfs.core.windows.net/",
 			"accountKey": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
