@@ -128,12 +128,6 @@ dbutils.fs.refreshMounts()
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC DROP TABLE IF EXISTS dim.dim_date;
-# MAGIC DROP TABLE IF EXISTS dim.dim_time;
-
-# COMMAND ----------
-
 from pyspark.sql.functions import col
 import os
 from urllib.request import urlretrieve

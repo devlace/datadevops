@@ -71,7 +71,7 @@ az role assignment create --assignee "$sp_stor_id" \
 
 # It takes time for AD permissions to propogate
 # TODO: make more robust
-sleep 1m
+sleep 2m
 
 # Use service principle to generate bearer token
 bearer_token=$(curl -X POST -d "grant_type=client_credentials&client_id=${sp_stor_id}&client_secret=${sp_stor_pass}&resource=https%3A%2F%2Fstorage.azure.com%2F" \

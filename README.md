@@ -31,7 +31,7 @@ Both Build and Release Pipelines are built using [AzureDevOps](https://dev.azure
 - [Build Pipelines](https://dev.azure.com/devlacepub/DataDevOps/_build)
 - [Release Pipeline](https://dev.azure.com/devlacepub/DataDevOps/_release)
 
-More information [here](docs/CI_CD.md).
+More information [here](docs/CI_CD_process.md).
 ### Environments
 
 - **Dev** - Development collaboration branch
@@ -109,10 +109,11 @@ NOTE: This deployment was tested using WSL (Ubuntu 16.04) and Debian GNU/Linux 9
     7. Select `Connections` > `Ls_AdlsGen2_01`. Update URL to the ADLS Gen2 Url of your DEV environment.
 
 4. **Setup Build Pipelines.** You will be creating two build pipelines, one which will trigger for every pull request which will run Unit Testing + Linting, and the second one which will trigger on every commit to master and will create the actual build artifacts for release.
-    1. In Azure DevOps, navigate to `Pipelines` > `Builds`. Select new Build Pipeline.
-    2. Under "Where is your code?", select Github (YAML) and select the correct forked repository.
+    1. In Azure DevOps, navigate to `Pipelines`. Select "Create Pipeline".
+    2. Under "Where is your code?", select Github (YAML).
         - If you have not yet already, you maybe prompted to connect your Github account. See [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops&tabs=yaml#grant-access-to-your-github-repositories) for more information.
-    3. Under "Configure your pipeline", select Existing Azure Pipelines YAML file.
+    3. Under "Select a repository", select your forked repo.
+    3. Under "Configure your pipeline", select "Existing Azure Pipelines YAML file".
         - Branch: master
         - Path: `/src/ddo_transform/azure-pipelines-ci-qa.yaml`
     4. Select `Run`.
