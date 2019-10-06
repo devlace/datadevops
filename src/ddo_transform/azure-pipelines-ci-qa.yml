@@ -14,7 +14,6 @@ pr:
 
 variables:
   WORKING_DIR: 'src/ddo_transform'
-  ARTIFACTS_FEED_NAME: devlacepub
 
 pool:
   vmImage: 'Ubuntu-16.04'
