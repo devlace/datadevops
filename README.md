@@ -107,6 +107,7 @@ NOTE: This deployment was tested using WSL (Ubuntu 16.04) and Debian GNU/Linux 9
     5. Navigating to "Author" tab, you should see all the pipelines deployed.
     6. Select `Connections` > `Ls_KeyVault`. Update the Base Url to the KeyVault Url of your DEV environment.
     7. Select `Connections` > `Ls_AdlsGen2_01`. Update URL to the ADLS Gen2 Url of your DEV environment.
+    8. Click `Publish` to publish changes.
 
 4. **Setup Build Pipelines.** You will be creating two build pipelines, one which will trigger for every pull request which will run Unit Testing + Linting, and the second one which will trigger on every commit to master and will create the actual build artifacts for release.
     1. In Azure DevOps, navigate to `Pipelines`. Select "Create Pipeline".
@@ -117,9 +118,14 @@ NOTE: This deployment was tested using WSL (Ubuntu 16.04) and Debian GNU/Linux 9
         - Branch: master
         - Path: `/src/ddo_transform/azure-pipelines-ci-qa.yaml`
     4. Select `Run`.
-    5. Repeat for `/src/ddo_transform/azure-pipelines-ci-artifacts`
+    5. Repeat steps 1-4, but select as the path `/src/ddo_transform/azure-pipelines-ci-artifacts`.
 
 5. **Setup Release Pipelines**
+    1. In Azure DevOps, navigate to `Release`. Select "New pipeline".
+    2. Under "Select a template", select "Empty job".
+    3. Under "Stage", set Stage name to "Deploy to STG".
+    4. Under Agent job, fill in information as shown: ![Release_1_AgentJob](images/Release_1_Agent_DeployToDatabricks.PNG?raw=true "CI/CD")
+    5. Add a step to the Agent job by select the "+" icon.
 
     **TODO**
 

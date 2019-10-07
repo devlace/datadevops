@@ -129,7 +129,7 @@ az keyvault secret set --vault-name $kv_name --name "spStorName" --value $sp_sto
 az keyvault secret set --vault-name $kv_name --name "spStorId" --value $sp_stor_id
 az keyvault secret set --vault-name $kv_name --name "spStorPass" --value $sp_stor_pass
 az keyvault secret set --vault-name $kv_name --name "spStorTenantId" --value $sp_stor_tenantid
-az keyvault secret set --vault-name $kv_name --name "dbricksDomain" --value ${dbricks_location}.azuredatabricks.net
+az keyvault secret set --vault-name $kv_name --name "dbricksDomain" --value https://${dbricks_location}.azuredatabricks.net
 az keyvault secret set --vault-name $kv_name --name "dbricksToken" --value $dbi_token
 
 
