@@ -21,17 +21,36 @@ sensors_filepath = base_path + infilefolder + "/MelbParkingSensorData.json"
 
 import ddo_transform.standardize as s
 
+# Retrieve schema
+parkingbay_schema = s.get_schema("in_parkingbay_schema")
+sensordata_schema = s.get_schema("in_sensordata_schema")
+
 # Read data
-parkingbay_sdf = spark.read.json(parkingbay_filepath, multiLine=True)
-sensordata_sdf = spark.read.json(sensors_filepath, multiLine=True)
+parkingbay_sdf = spark.read\
+  .option("badRecordsPath", os.path.join(base_path, "__corrupt", "MelbParkingBayData"))\
+  .option("multiLine", True)\
+  .option("schema", parkingbay_schema)\
+  .json(parkingbay_filepath)
+sensordata_sdf = spark.read\
+  .option("badRecordsPath", os.path.join(base_path, "__corrupt", "MelbParkingSensorData"))\
+  .option("multiLine", True)\
+  .option("schema", sensordata_schema)\
+  .json(sensors_filepath)
+
 
 # Standardize
-t_parkingbay_sdf = s.standardize_parking_bay(parkingbay_sdf, load_id, loaded_on)
-t_sensordata_sdf = s.standardize_sensordata(sensordata_sdf, load_id, loaded_on)
+t_parkingbay_sdf, t_parkingbay_malformed_sdf = s.standardize_parking_bay(parkingbay_sdf, load_id, loaded_on)
+t_sensordata_sdf, t_sensordata_malformed_sdf = s.standardize_sensordata(sensordata_sdf, load_id, loaded_on)
 
 # Insert new rows
 t_parkingbay_sdf.write.mode("append").insertInto("interim.parking_bay")
 t_sensordata_sdf.write.mode("append").insertInto("interim.sensor")
 
+# Insert bad rows
+t_parkingbay_malformed_sdf.write.mode("append").insertInto("malformed.parking_bay")
+t_sensordata_malformed_sdf.write.mode("append").insertInto("malformed.sensor")
+
+
 # COMMAND ----------
+
 
