@@ -93,9 +93,9 @@ installedit: clean ## install the package while dynamically picking up changes t
 
 uploaddatabricks: dist
 	package_name="$$(find dist/*.whl -printf "%f\n")"; \
-	databricks fs cp --overwrite dist/"$$package_name" "dbfs:/mnt/datalake/libs/$$package_name";\
+	databricks fs cp --overwrite dist/"$$package_name" "$(DATABRICKS_DBFS_UPLOAD_PATH)/libs/$$package_name";\
 
 installdatabricks: dist uploaddatabricks ## install the package in databricks
 	package_name="$$(find dist/*.whl -printf "%f\n")"; \
-	databricks libraries install --cluster-id $(databricks_clusterid) --whl "dbfs:/mnt/datalake/libs/$$package_name"
+	databricks libraries install --cluster-id $(databricks_clusterid) --whl "$(DATABRICKS_DBFS_UPLOAD_PATH)/libs/$$package_name"
 	databricks clusters restart --cluster-id $(databricks_clusterid)

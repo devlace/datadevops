@@ -29,21 +29,25 @@ def spark():
 
 def test_standardize_parking_bay(spark):
     """Test data transform"""
-    parkingbay_sdf = spark.read.json("./data/MelbParkingBayData.json", multiLine=True)
+    schema = standardize.get_schema("in_parkingbay_schema")
+    parkingbay_sdf = spark.read.json("./data/MelbParkingBayData.json", multiLine=True, schema=schema)
     load_id = 1
     loaded_on = datetime.datetime.now()
-    t_parkingbay_sdf = standardize.standardize_parking_bay(parkingbay_sdf, load_id, loaded_on)
+    t_parkingbay_sdf, t_parkingbay_malformed_sdf = standardize.standardize_parking_bay(parkingbay_sdf, load_id, loaded_on)  # noqa: E501
 
     assert t_parkingbay_sdf.count() != 0
+    assert t_parkingbay_malformed_sdf.count() == 0
     assert t_parkingbay_sdf.filter(isnull("bay_id")).count() == 0
 
 
 def test_standardize_sensordata(spark):
     """Test data transform"""
-    sensordata_sdf = spark.read.json("./data/MelbParkingSensorData.json", multiLine=True)
+    schema = standardize.get_schema("in_sensordata_schema")
+    sensordata_sdf = spark.read.json("./data/MelbParkingSensorData.json", multiLine=True, schema=schema)
     load_id = 1
     loaded_on = datetime.datetime.now()
-    t_sensordata_sdf = standardize.standardize_sensordata(sensordata_sdf, load_id, loaded_on)
+    t_sensordata_sdf, t_sensordata_malformed_sdf = standardize.standardize_sensordata(sensordata_sdf, load_id, loaded_on)  # noqa: E501
 
     assert t_sensordata_sdf.count() != 0
+    assert t_sensordata_malformed_sdf.count() == 0
     assert t_sensordata_sdf.filter(isnull("bay_id")).count() == 0

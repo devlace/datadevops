@@ -6,10 +6,31 @@
 import uuid
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit, udf, col, when
-from pyspark.sql.types import StringType
-
+from pyspark.sql.types import (
+    ArrayType, StructType, StructField, StringType, TimestampType, DoubleType, IntegerType)  # noqa: E501
 
 uuidUdf = udf(lambda: str(uuid.uuid4()), StringType())
+
+
+def get_schema(schema_name):
+    if schema_name == 'interim_parkingbay_schema':
+        schema = StructType([
+            StructField('bay_id', IntegerType(), False),
+            StructField('last_edit', StringType()),
+            StructField('marker_id', StringType()),
+            StructField('meter_id', StringType()),
+            StructField('rd_seg_id', StringType()),
+            StructField('rd_seg_dsc', StringType()),
+            StructField('the_geom', StructType([
+                StructField('coordinates', ArrayType(
+                    ArrayType(ArrayType(ArrayType(DoubleType())))
+                )),
+                StructField('type', StringType())
+            ])),
+            StructField('load_id', StringType()),
+            StructField('loaded_on', TimestampType())
+        ])
+    return schema
 
 
 def process_dim_parking_bay(parkingbay_sdf: DataFrame,
