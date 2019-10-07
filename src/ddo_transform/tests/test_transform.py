@@ -28,7 +28,8 @@ def spark():
 
 def test_process_dim_parking_bay(spark):
     """Test data transform"""
-    parkingbay_sdf = spark.read.json("./data/MelbParkingBayData.json", multiLine=True)
+    parkingbay_schema = transform.get_schema("interim_parkingbay_schema")
+    parkingbay_sdf = spark.read.json("./data/interim_parking_bay.json", multiLine=True, schema=parkingbay_schema)
     dim_parkingbay_sdf = spark.read.json("./data/dim_parking_bay.json", multiLine=True)
     load_id = 1
     loaded_on = datetime.datetime.now()

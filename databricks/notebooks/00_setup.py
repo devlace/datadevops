@@ -53,6 +53,7 @@ dbutils.fs.refreshMounts()
 # MAGIC CREATE SCHEMA IF NOT EXISTS dw;
 # MAGIC CREATE SCHEMA IF NOT EXISTS lnd;
 # MAGIC CREATE SCHEMA IF NOT EXISTS interim;
+# MAGIC CREATE SCHEMA IF NOT EXISTS malformed;
 # MAGIC 
 # MAGIC DROP TABLE IF EXISTS dw.fact_parking;
 # MAGIC DROP TABLE IF EXISTS dw.dim_st_marker;
@@ -60,6 +61,12 @@ dbutils.fs.refreshMounts()
 # MAGIC DROP TABLE IF EXISTS dw.dim_parking_bay;
 # MAGIC DROP TABLE IF EXISTS dw.dim_date;
 # MAGIC DROP TABLE IF EXISTS dw.dim_time;
+# MAGIC 
+# MAGIC DROP TABLE IF EXISTS interim.parking_bay;
+# MAGIC DROP TABLE IF EXISTS interim.sensor;
+# MAGIC 
+# MAGIC DROP TABLE IF EXISTS malformed.parking_bay;
+# MAGIC DROP TABLE IF EXISTS malformed.sensor;
 
 # COMMAND ----------
 
@@ -156,7 +163,6 @@ dimtime.write.saveAsTable("dw.dim_time")
 
 # MAGIC %sql
 # MAGIC -- INTERIM tables
-# MAGIC 
 # MAGIC DROP TABLE IF EXISTS interim.parking_bay;
 # MAGIC CREATE TABLE interim.parking_bay (
 # MAGIC   bay_id INT,
@@ -193,4 +199,38 @@ dimtime.write.saveAsTable("dw.dim_time")
 
 # COMMAND ----------
 
-
+# MAGIC %sql
+# MAGIC -- ERROR tables
+# MAGIC DROP TABLE IF EXISTS malformed.parking_bay;
+# MAGIC CREATE TABLE malformed.parking_bay (
+# MAGIC   bay_id INT,
+# MAGIC   `last_edit` TIMESTAMP,
+# MAGIC   `marker_id` STRING, 
+# MAGIC   `meter_id` STRING, 
+# MAGIC   `rd_seg_dsc` STRING, 
+# MAGIC   `rd_seg_id` STRING, 
+# MAGIC   `the_geom` STRUCT<`coordinates`: ARRAY<ARRAY<ARRAY<ARRAY<DOUBLE>>>>, `type`: STRING>,
+# MAGIC   load_id STRING,
+# MAGIC   loaded_on TIMESTAMP
+# MAGIC )
+# MAGIC USING parquet
+# MAGIC LOCATION '/mnt/datalake/data/interim/parking_bay/';
+# MAGIC 
+# MAGIC REFRESH TABLE interim.parking_bay;
+# MAGIC 
+# MAGIC --
+# MAGIC DROP TABLE IF EXISTS malformed.sensor;
+# MAGIC CREATE TABLE malformed.sensor (
+# MAGIC   bay_id INT,
+# MAGIC   `st_marker_id` STRING,
+# MAGIC   `lat` FLOAT,
+# MAGIC   `lon` FLOAT, 
+# MAGIC   `location` STRUCT<`coordinates`: ARRAY<DOUBLE>, `type`: STRING>, 
+# MAGIC   `status` STRING, 
+# MAGIC   load_id STRING,
+# MAGIC   loaded_on TIMESTAMP
+# MAGIC )
+# MAGIC USING parquet
+# MAGIC LOCATION '/mnt/datalake/data/interim/sensors/';
+# MAGIC 
+# MAGIC REFRESH TABLE interim.sensor;
