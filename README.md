@@ -25,7 +25,7 @@ The following shows the overall architecture of the solution.
 
 The following shows the overall CI/CD process end to end.
 
-![CI/CD](images/CI_CD.PNG?raw=true "CI/CD")
+![CI/CD](images/CI_CD_process.PNG?raw=true "CI/CD")
 
 Both Build and Release Pipelines are built using [AzureDevOps](https://dev.azure.com/) (Public instance) and can be view using the following links:
 - [Build Pipelines](https://dev.azure.com/devlacepub/DataDevOps/_build)
@@ -121,13 +121,17 @@ NOTE: This deployment was tested using WSL (Ubuntu 16.04) and Debian GNU/Linux 9
     5. Repeat steps 1-4, but select as the path `/src/ddo_transform/azure-pipelines-ci-artifacts`.
 
 5. **Setup Release Pipelines**
+    
+    **WORK IN PROGRESS**
     1. In Azure DevOps, navigate to `Release`. Select "New pipeline".
     2. Under "Select a template", select "Empty job".
     3. Under "Stage", set Stage name to "Deploy to STG".
-    4. Under Agent job, fill in information as shown: ![Release_1_AgentJob](images/Release_1_Agent_DeployToDatabricks.PNG?raw=true "CI/CD")
+    4. Under Agent job, fill in information as shown: 
+   
+   ![Release_1_AgentJob](images/Release_1_Agent_DeployToDatabricks.PNG?raw=true "CI/CD")
+    
     5. Add a step to the Agent job by select the "+" icon.
 
-    **TODO**
 
 
 ## Known Issues, Limitations and Workarounds
