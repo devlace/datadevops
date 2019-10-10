@@ -454,3 +454,5 @@ MigrationBackup/
 
 # Devcontainer
 .devcontainer/
+
+.vscode/

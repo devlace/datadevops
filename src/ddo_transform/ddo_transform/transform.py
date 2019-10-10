@@ -7,12 +7,13 @@ import uuid
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit, udf, col, when
 from pyspark.sql.types import (
-    ArrayType, StructType, StructField, StringType, TimestampType, DoubleType, IntegerType)  # noqa: E501
+    ArrayType, StructType, StructField, StringType, TimestampType, DoubleType, IntegerType, FloatType)  # noqa: E501
 
 uuidUdf = udf(lambda: str(uuid.uuid4()), StringType())
 
 
 def get_schema(schema_name):
+    schema = None
     if schema_name == 'interim_parkingbay_schema':
         schema = StructType([
             StructField('bay_id', IntegerType(), False),
@@ -30,14 +31,65 @@ def get_schema(schema_name):
             StructField('load_id', StringType()),
             StructField('loaded_on', TimestampType())
         ])
+    elif schema_name == 'interim_sensor':
+        schema = StructType([
+            StructField('bay_id', IntegerType(), False),
+            StructField('st_marker_id', StringType()),
+            StructField('lat', FloatType()),
+            StructField('lon', FloatType()),
+            StructField('location', StructType([
+                StructField('coordinates', ArrayType(DoubleType())),
+                StructField('type', StringType())
+            ]), False),
+            StructField('status', StringType()),
+            StructField('load_id', StringType()),
+            StructField('loaded_on', TimestampType())
+        ])
+    elif schema_name == 'dw_dim_parking_bay':
+        schema = StructType([
+            StructField('dim_parking_bay_id', StringType(), False),
+            StructField('bay_id', IntegerType(), False),
+            StructField('marker_id', StringType()),
+            StructField('meter_id', StringType()),
+            StructField('rd_seg_id', StringType()),
+            StructField('rd_seg_dsc', StringType()),
+            StructField('the_geom', StructType([
+                StructField('coordinates', ArrayType(
+                    ArrayType(ArrayType(ArrayType(DoubleType())))
+                )),
+                StructField('type', StringType())
+            ])),
+            StructField('load_id', StringType()),
+            StructField('loaded_on', TimestampType())
+        ])
+    elif schema_name == 'dw_dim_location':
+        schema = StructType([
+            StructField('dim_location_id', StringType(), False),
+            StructField('location', StructType([
+                StructField('coordinates', ArrayType(DoubleType())),
+                StructField('type', StringType())
+            ]), False),
+            StructField('lat', FloatType()),
+            StructField('lon', FloatType()),
+            StructField('load_id', StringType()),
+            StructField('loaded_on', TimestampType())
+        ])
+    elif schema_name == 'dw_dim_st_marker':
+        schema = StructType([
+            StructField('dim_st_marker_id', StringType(), False),
+            StructField('st_marker_id', StringType()),
+            StructField('load_id', StringType()),
+            StructField('loaded_on', TimestampType())
+        ])
     return schema
 
 
 def process_dim_parking_bay(parkingbay_sdf: DataFrame,
                             dim_parkingbay_sdf: DataFrame,
                             load_id, loaded_on):
-    """Transform sensordata into dim_parking_bay"""
-
+    """Transform incoming parkingbay_sdf data and existing dim_parking_bay
+    into the latest version of records of dim_parking_bay data.
+    """
     # Get landing data distint rows
     parkingbay_sdf = parkingbay_sdf\
         .select([
@@ -49,19 +101,45 @@ def process_dim_parking_bay(parkingbay_sdf: DataFrame,
             "the_geom"])\
         .distinct()
 
-    # Get new rows to insert through LEFT JOIN with existing rows
-    nr_parkingbay_sdf = parkingbay_sdf.alias("pb")\
+    # Using a left_outer join on the business key (bay_id),
+    # identify rows that do NOT EXIST in landing data that EXISTS in existing Dimension table
+    oldrows_parkingbay_sdf = dim_parkingbay_sdf.alias("dim")\
+        .join(parkingbay_sdf, "bay_id", "left_outer")\
+        .where(parkingbay_sdf["bay_id"].isNull())\
+        .select(col("dim.*"))
+
+    # Using a left_outer join on the business key (bay_id),
+    # Identify rows that EXISTS in incoming landing data that does also EXISTS in existing Dimension table
+    # and take the values of the incoming landing data. That is, we update existing table values.
+    existingrows_parkingbay_sdf = parkingbay_sdf.alias("pb")\
+        .join(dim_parkingbay_sdf.alias("dim"), "bay_id", "left_outer")\
+        .where(dim_parkingbay_sdf["bay_id"].isNotNull())\
+        .select(
+            col("dim.dim_parking_bay_id"),
+            col("pb.bay_id"),
+            col("pb.marker_id"),
+            col("pb.meter_id"),
+            col("pb.rd_seg_dsc"),
+            col("pb.rd_seg_id"),
+            col("pb.the_geom")
+        )
+
+    # Using a left_outer join on the business key (bay_id),
+    # Identify rows that EXISTS in landing data that does NOT EXISTS in existing Dimension table
+    newrows_parkingbay_sdf = parkingbay_sdf.alias("pb")\
         .join(dim_parkingbay_sdf, "bay_id", "left_outer")\
         .where(dim_parkingbay_sdf["bay_id"].isNull())\
         .select(col("pb.*"))
 
     # Add load_id, loaded_at and dim_parking_bay_id
-    nr_parkingbay_sdf = nr_parkingbay_sdf.withColumn("load_id", lit(load_id))\
+    existingrows_parkingbay_sdf = existingrows_parkingbay_sdf.withColumn("load_id", lit(load_id))\
+        .withColumn("loaded_on", lit(loaded_on.isoformat()))
+    newrows_parkingbay_sdf = newrows_parkingbay_sdf.withColumn("load_id", lit(load_id))\
         .withColumn("loaded_on", lit(loaded_on.isoformat()))\
         .withColumn("dim_parking_bay_id", uuidUdf())
 
     # Select relevant columns
-    nr_parkingbay_sdf = nr_parkingbay_sdf.select([
+    relevant_cols = [
         "dim_parking_bay_id",
         "bay_id",
         "marker_id",
@@ -71,8 +149,16 @@ def process_dim_parking_bay(parkingbay_sdf: DataFrame,
         "the_geom",
         "load_id",
         "loaded_on"
-    ])
-    return nr_parkingbay_sdf
+    ]
+    oldrows_parkingbay_sdf = oldrows_parkingbay_sdf.select(relevant_cols)
+    existingrows_parkingbay_sdf = existingrows_parkingbay_sdf.select(relevant_cols)
+    newrows_parkingbay_sdf = newrows_parkingbay_sdf.select(relevant_cols)
+
+    allrows_parkingbay_sdf = oldrows_parkingbay_sdf\
+        .union(existingrows_parkingbay_sdf)\
+        .union(newrows_parkingbay_sdf)
+
+    return allrows_parkingbay_sdf
 
 
 def process_dim_location(sensordata_sdf: DataFrame, dim_location: DataFrame,
@@ -83,26 +169,58 @@ def process_dim_location(sensordata_sdf: DataFrame, dim_location: DataFrame,
     sensordata_sdf = sensordata_sdf\
         .select(["lat", "lon", "location"]).distinct()
 
-    # Get new rows to insert through LEFT JOIN with existing rows
-    nr_location_sdf = sensordata_sdf\
+    # Using a left_outer join
+    # identify rows that do NOT EXIST in landing data that EXISTS in existing Dimension table
+    oldrows_sdf = dim_location.alias("dim")\
+        .join(sensordata_sdf, ["lat", "lon", "location"], "left_outer")\
+        .where(sensordata_sdf["lat"].isNull() & sensordata_sdf["lon"].isNull())\
+        .select(col("dim.*"))
+
+    # Using a left_outer join
+    # Identify rows that EXISTS in incoming landing data that does also EXISTS in existing Dimension table
+    # and take the values of the incoming landing data. That is, we update existing table values.
+    existingrows_sdf = sensordata_sdf.alias("in")\
+        .join(dim_location.alias("dim"), ["lat", "lon", "location"], "left_outer")\
+        .where(dim_location["lat"].isNotNull() & dim_location["lon"].isNotNull())\
+        .select(
+            col("dim.dim_location_id"),
+            col("in.location"),
+            col("in.lat"),
+            col("in.lon")
+        )
+
+    # Using a left_outer join
+    # Identify rows that EXISTS in landing data that does NOT EXISTS in existing Dimension table
+    newrows_sdf = sensordata_sdf.alias("in")\
         .join(dim_location, ["lat", "lon", "location"], "left_outer")\
-        .where(dim_location["lat"].isNull() & dim_location["lon"].isNull())
+        .where(dim_location["lat"].isNull() & dim_location["lon"].isNull())\
+        .select(col("in.*"))
 
     # Add load_id, loaded_at and dim_parking_bay_id
-    nr_location_sdf = nr_location_sdf.withColumn("load_id", lit(load_id))\
+    existingrows_sdf = existingrows_sdf.withColumn("load_id", lit(load_id))\
+        .withColumn("loaded_on", lit(loaded_on.isoformat()))
+    newrows_sdf = newrows_sdf.withColumn("load_id", lit(load_id))\
         .withColumn("loaded_on", lit(loaded_on.isoformat()))\
         .withColumn("dim_location_id", uuidUdf())
 
     # Select relevant columns
-    nr_location_sdf = nr_location_sdf.select([
+    relevant_cols = [
         "dim_location_id",
         "location",
         "lat",
         "lon",
         "load_id",
         "loaded_on"
-    ])
-    return nr_location_sdf
+    ]
+    oldrows_sdf = oldrows_sdf.select(relevant_cols)
+    existingrows_sdf = existingrows_sdf.select(relevant_cols)
+    newrows_sdf = newrows_sdf.select(relevant_cols)
+
+    allrows_sdf = oldrows_sdf\
+        .union(existingrows_sdf)\
+        .union(newrows_sdf)
+
+    return allrows_sdf
 
 
 def process_dim_st_marker(sensordata_sdf: DataFrame,
@@ -113,24 +231,51 @@ def process_dim_st_marker(sensordata_sdf: DataFrame,
     # Get landing data distint rows
     sensordata_sdf = sensordata_sdf.select(["st_marker_id"]).distinct()
 
-    # Get new rows to insert through LEFT JOIN with existing rows
-    nr_st_marker_sdf = sensordata_sdf\
+    # Using a left_outer join
+    # identify rows that do NOT EXIST in landing data that EXISTS in existing Dimension table
+    oldrows_sdf = dim_st_marker.alias("dim")\
+        .join(sensordata_sdf, ["st_marker_id"], "left_outer")\
+        .where(sensordata_sdf["st_marker_id"].isNull())\
+        .select(col("dim.*"))
+
+    # Using a left_outer join
+    # Identify rows that EXISTS in incoming landing data that does also EXISTS in existing Dimension table
+    # and take the values of the incoming landing data. That is, we update existing table values.
+    existingrows_sdf = sensordata_sdf.alias("in")\
+        .join(dim_st_marker.alias("dim"), ["st_marker_id"], "left_outer")\
+        .where(dim_st_marker["st_marker_id"].isNotNull())\
+        .select(col("dim.dim_st_marker_id"), col("in.st_marker_id"))
+
+    # Using a left_outer join
+    # Identify rows that EXISTS in landing data that does NOT EXISTS in existing Dimension table
+    newrows_sdf = sensordata_sdf.alias("in")\
         .join(dim_st_marker, ["st_marker_id"], "left_outer")\
-        .where(dim_st_marker["st_marker_id"].isNull())
+        .where(dim_st_marker["st_marker_id"].isNull())\
+        .select(col("in.*"))
 
     # Add load_id, loaded_at and dim_parking_bay_id
-    nr_st_marker_sdf = nr_st_marker_sdf.withColumn("load_id", lit(load_id))\
+    existingrows_sdf = existingrows_sdf.withColumn("load_id", lit(load_id))\
+        .withColumn("loaded_on", lit(loaded_on.isoformat()))
+    newrows_sdf = newrows_sdf.withColumn("load_id", lit(load_id))\
         .withColumn("loaded_on", lit(loaded_on.isoformat()))\
         .withColumn("dim_st_marker_id", uuidUdf())
 
     # Select relevant columns
-    nr_st_marker_sdf = nr_st_marker_sdf.select([
+    relevant_cols = [
         "dim_st_marker_id",
         "st_marker_id",
         "load_id",
         "loaded_on"
-    ])
-    return nr_st_marker_sdf
+    ]
+    oldrows_sdf = oldrows_sdf.select(relevant_cols)
+    existingrows_sdf = existingrows_sdf.select(relevant_cols)
+    newrows_sdf = newrows_sdf.select(relevant_cols)
+
+    allrows_sdf = oldrows_sdf\
+        .union(existingrows_sdf)\
+        .union(newrows_sdf)
+
+    return allrows_sdf
 
 
 def process_fact_parking(sensordata_sdf: DataFrame,
@@ -163,3 +308,81 @@ def process_fact_parking(sensordata_sdf: DataFrame,
             lit(loaded_on.isoformat()).alias("loaded_on")
         )
     return fact_parking
+
+
+if __name__ == "__main__":
+    from pyspark.sql import SparkSession
+    import datetime
+    import os
+
+    spark = SparkSession.builder\
+        .master("local[2]")\
+        .appName("transform.py")\
+        .getOrCreate()
+    spark.sparkContext.setLogLevel("ERROR")
+
+    THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+    load_id = 1
+    loaded_on = datetime.datetime.now()
+
+    def _run_process_dim_parking_bay():
+        parkingbay_sdf = spark.read\
+            .schema(get_schema("interim_parkingbay_schema"))\
+            .json(os.path.join(THIS_DIR, "../data/interim_parking_bay.json"))
+        dim_parkingbay_sdf = spark.read\
+            .schema(schema=get_schema("dw_dim_parking_bay"))\
+            .json(os.path.join(THIS_DIR, "../data/dim_parking_bay.json"))
+        new_dim_parkingbay_sdf = process_dim_parking_bay(parkingbay_sdf, dim_parkingbay_sdf, load_id, loaded_on)
+        return new_dim_parkingbay_sdf
+
+    def _run_process_dim_location():
+        sensor_sdf = spark.read\
+            .schema(get_schema("interim_sensor"))\
+            .json(os.path.join(THIS_DIR, "../data/interim_sensor.json"))
+        dim_location_sdf = spark.read\
+            .schema(schema=get_schema("dw_dim_location"))\
+            .json(os.path.join(THIS_DIR, "../data/dim_location.json"))
+        new_dim_location_sdf = process_dim_location(sensor_sdf, dim_location_sdf, load_id, loaded_on)
+        return new_dim_location_sdf
+
+    def _run_process_dim_st_marker():
+        sensor_sdf = spark.read\
+            .schema(get_schema("interim_sensor"))\
+            .json(os.path.join(THIS_DIR, "../data/interim_sensor.json"))
+        dim_st_marker_sdf = spark.read\
+            .schema(schema=get_schema("dw_dim_st_marker"))\
+            .json(os.path.join(THIS_DIR, "../data/dim_st_marker.json"))
+        new_dim_st_marker_sdf = process_dim_st_marker(sensor_sdf, dim_st_marker_sdf, load_id, loaded_on)
+        return new_dim_st_marker_sdf
+
+    def _run_process_fact_parking():
+        sensor_sdf = spark.read\
+            .schema(get_schema("interim_sensor"))\
+            .json(os.path.join(THIS_DIR, "../data/interim_sensor.json"))
+        dim_parking_bay_sdf = spark.read\
+            .schema(schema=get_schema("dw_dim_parking_bay"))\
+            .json(os.path.join(THIS_DIR, "../data/dim_parking_bay.json"))
+        dim_location_sdf = spark.read\
+            .schema(schema=get_schema("dw_dim_location"))\
+            .json(os.path.join(THIS_DIR, "../data/dim_location.json"))
+        dim_st_marker_sdf = spark.read\
+            .schema(schema=get_schema("dw_dim_st_marker"))\
+            .json(os.path.join(THIS_DIR, "../data/dim_st_marker.json"))
+        new_fact_parking = process_fact_parking(sensor_sdf,
+                                                dim_parking_bay_sdf,
+                                                dim_location_sdf,
+                                                dim_st_marker_sdf,
+                                                load_id, loaded_on)
+        return new_fact_parking
+
+    def _inspect_df(df: DataFrame):
+        df.show()
+        df.printSchema()
+        print(df.count())
+
+    # _inspect_df(_run_process_dim_parking_bay())
+    # _inspect_df(_run_process_dim_location())
+    # _inspect_df(_run_process_dim_st_marker())
+    _inspect_df(_run_process_fact_parking())
+
+    print("done!")
