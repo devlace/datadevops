@@ -52,3 +52,7 @@ t_sensordata_sdf.write.mode("append").insertInto("interim.sensor")
 t_parkingbay_malformed_sdf.write.mode("append").insertInto("malformed.parking_bay")
 t_sensordata_malformed_sdf.write.mode("append").insertInto("malformed.sensor")
 
+
+# COMMAND ----------
+
+
