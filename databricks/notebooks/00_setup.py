@@ -73,14 +73,14 @@ dbutils.fs.refreshMounts()
 # MAGIC %sql
 # MAGIC -- FACT tables
 # MAGIC CREATE TABLE dw.fact_parking (
-# MAGIC   dim_date_id STRING,
-# MAGIC   dim_time_id STRING,
-# MAGIC   dim_parking_bay_id STRING,
-# MAGIC   dim_location_id STRING,
-# MAGIC   dim_st_marker_id STRING,
-# MAGIC   status STRING,
-# MAGIC   load_id STRING,
-# MAGIC   loaded_on TIMESTAMP
+# MAGIC   `dim_date_id` STRING,
+# MAGIC   `dim_time_id` STRING,
+# MAGIC   `dim_parking_bay_id` STRING,
+# MAGIC   `dim_location_id` STRING,
+# MAGIC   `dim_st_marker_id` STRING,
+# MAGIC   `status` STRING,
+# MAGIC   `load_id` STRING,
+# MAGIC   `loaded_on` TIMESTAMP
 # MAGIC )
 # MAGIC USING parquet
 # MAGIC LOCATION '/mnt/datalake/data/dw/fact_parking/';
@@ -92,10 +92,10 @@ dbutils.fs.refreshMounts()
 # MAGIC %sql
 # MAGIC -- DIMENSION tables
 # MAGIC CREATE TABLE dw.dim_st_marker (
-# MAGIC   dim_st_marker_id STRING,
-# MAGIC   st_marker_id STRING,
-# MAGIC   load_id STRING,
-# MAGIC   loaded_on TIMESTAMP
+# MAGIC   `dim_st_marker_id` STRING,
+# MAGIC   `st_marker_id` STRING,
+# MAGIC   `load_id` STRING,
+# MAGIC   `loaded_on` TIMESTAMP
 # MAGIC )
 # MAGIC USING parquet
 # MAGIC LOCATION '/mnt/datalake/data/dw/dim_st_marker/';
@@ -104,12 +104,12 @@ dbutils.fs.refreshMounts()
 # MAGIC 
 # MAGIC --
 # MAGIC CREATE TABLE dw.dim_location (
-# MAGIC   dim_location_id STRING,
+# MAGIC   `dim_location_id` STRING,
 # MAGIC   `location` STRUCT<`coordinates`: ARRAY<DOUBLE>, `type`: STRING>,
-# MAGIC   lat FLOAT,
-# MAGIC   lon FLOAT,
-# MAGIC   load_id STRING,
-# MAGIC   loaded_on TIMESTAMP
+# MAGIC   `lat` FLOAT,
+# MAGIC   `lon` FLOAT,
+# MAGIC   `load_id` STRING,
+# MAGIC   `loaded_on` TIMESTAMP
 # MAGIC )
 # MAGIC USING parquet
 # MAGIC LOCATION '/mnt/datalake/data/dw/dim_location/';
@@ -118,8 +118,8 @@ dbutils.fs.refreshMounts()
 # MAGIC 
 # MAGIC --
 # MAGIC CREATE TABLE dw.dim_parking_bay (
-# MAGIC   dim_parking_bay_id STRING,
-# MAGIC   bay_id STRING,
+# MAGIC   `dim_parking_bay_id` STRING,
+# MAGIC   `bay_id` INT,
 # MAGIC   `marker_id` STRING, 
 # MAGIC   `meter_id` STRING, 
 # MAGIC   `rd_seg_dsc` STRING, 
@@ -165,7 +165,7 @@ dimtime.write.saveAsTable("dw.dim_time")
 # MAGIC -- INTERIM tables
 # MAGIC DROP TABLE IF EXISTS interim.parking_bay;
 # MAGIC CREATE TABLE interim.parking_bay (
-# MAGIC   bay_id INT,
+# MAGIC   `bay_id` INT,
 # MAGIC   `last_edit` TIMESTAMP,
 # MAGIC   `marker_id` STRING, 
 # MAGIC   `meter_id` STRING, 
@@ -183,7 +183,7 @@ dimtime.write.saveAsTable("dw.dim_time")
 # MAGIC --
 # MAGIC DROP TABLE IF EXISTS interim.sensor;
 # MAGIC CREATE TABLE interim.sensor (
-# MAGIC   bay_id INT,
+# MAGIC   `bay_id` INT,
 # MAGIC   `st_marker_id` STRING,
 # MAGIC   `lat` FLOAT,
 # MAGIC   `lon` FLOAT, 
@@ -203,7 +203,7 @@ dimtime.write.saveAsTable("dw.dim_time")
 # MAGIC -- ERROR tables
 # MAGIC DROP TABLE IF EXISTS malformed.parking_bay;
 # MAGIC CREATE TABLE malformed.parking_bay (
-# MAGIC   bay_id INT,
+# MAGIC   `bay_id` INT,
 # MAGIC   `last_edit` TIMESTAMP,
 # MAGIC   `marker_id` STRING, 
 # MAGIC   `meter_id` STRING, 
@@ -221,7 +221,7 @@ dimtime.write.saveAsTable("dw.dim_time")
 # MAGIC --
 # MAGIC DROP TABLE IF EXISTS malformed.sensor;
 # MAGIC CREATE TABLE malformed.sensor (
-# MAGIC   bay_id INT,
+# MAGIC   `bay_id` INT,
 # MAGIC   `st_marker_id` STRING,
 # MAGIC   `lat` FLOAT,
 # MAGIC   `lon` FLOAT, 
