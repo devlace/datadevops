@@ -43,10 +43,11 @@ stages:
     - script: make test && make lint
       workingDirectory: $(WORKING_DIR)
       displayName: 'Run lint tests'
-  - job: 'validate_python_packages'
-    displayName: 'Validate Python Packages'
+
+  - job: 'validate_sql_packages'
+    displayName: 'Validate SQL Packages'
     pool:
-      vmImage: 'Ubuntu-16.04'
+      vmImage: 'windows-latest'
     steps:
     - task: NuGetToolInstaller@1
 
