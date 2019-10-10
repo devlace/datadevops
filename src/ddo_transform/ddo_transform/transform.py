@@ -10,6 +10,7 @@ from pyspark.sql.types import (
     ArrayType, StructType, StructField, StringType, TimestampType, DoubleType, IntegerType, FloatType)  # noqa: E501
 
 uuidUdf = udf(lambda: str(uuid.uuid4()), StringType())
+EMPTY_UUID = '00000000-0000-0000-0000-000000000000'
 
 
 def get_schema(schema_name):
@@ -97,8 +98,7 @@ def process_dim_parking_bay(parkingbay_sdf: DataFrame,
             "marker_id",
             "meter_id",
             "rd_seg_dsc",
-            "rd_seg_id",
-            "the_geom"])\
+            "rd_seg_id"])\
         .distinct()
 
     # Using a left_outer join on the business key (bay_id),
@@ -120,8 +120,7 @@ def process_dim_parking_bay(parkingbay_sdf: DataFrame,
             col("pb.marker_id"),
             col("pb.meter_id"),
             col("pb.rd_seg_dsc"),
-            col("pb.rd_seg_id"),
-            col("pb.the_geom")
+            col("pb.rd_seg_id")
         )
 
     # Using a left_outer join on the business key (bay_id),
@@ -133,9 +132,9 @@ def process_dim_parking_bay(parkingbay_sdf: DataFrame,
 
     # Add load_id, loaded_at and dim_parking_bay_id
     existingrows_parkingbay_sdf = existingrows_parkingbay_sdf.withColumn("load_id", lit(load_id))\
-        .withColumn("loaded_on", lit(loaded_on.isoformat()))
+        .withColumn("loaded_on", lit(loaded_on.isoformat()).cast("timestamp"))
     newrows_parkingbay_sdf = newrows_parkingbay_sdf.withColumn("load_id", lit(load_id))\
-        .withColumn("loaded_on", lit(loaded_on.isoformat()))\
+        .withColumn("loaded_on", lit(loaded_on.isoformat()).cast("timestamp"))\
         .withColumn("dim_parking_bay_id", uuidUdf())
 
     # Select relevant columns
@@ -146,7 +145,6 @@ def process_dim_parking_bay(parkingbay_sdf: DataFrame,
         "meter_id",
         "rd_seg_dsc",
         "rd_seg_id",
-        "the_geom",
         "load_id",
         "loaded_on"
     ]
@@ -167,12 +165,12 @@ def process_dim_location(sensordata_sdf: DataFrame, dim_location: DataFrame,
 
     # Get landing data distint rows
     sensordata_sdf = sensordata_sdf\
-        .select(["lat", "lon", "location"]).distinct()
+        .select(["lat", "lon"]).distinct()
 
     # Using a left_outer join
     # identify rows that do NOT EXIST in landing data that EXISTS in existing Dimension table
     oldrows_sdf = dim_location.alias("dim")\
-        .join(sensordata_sdf, ["lat", "lon", "location"], "left_outer")\
+        .join(sensordata_sdf, ["lat", "lon"], "left_outer")\
         .where(sensordata_sdf["lat"].isNull() & sensordata_sdf["lon"].isNull())\
         .select(col("dim.*"))
 
@@ -180,11 +178,10 @@ def process_dim_location(sensordata_sdf: DataFrame, dim_location: DataFrame,
     # Identify rows that EXISTS in incoming landing data that does also EXISTS in existing Dimension table
     # and take the values of the incoming landing data. That is, we update existing table values.
     existingrows_sdf = sensordata_sdf.alias("in")\
-        .join(dim_location.alias("dim"), ["lat", "lon", "location"], "left_outer")\
+        .join(dim_location.alias("dim"), ["lat", "lon"], "left_outer")\
         .where(dim_location["lat"].isNotNull() & dim_location["lon"].isNotNull())\
         .select(
             col("dim.dim_location_id"),
-            col("in.location"),
             col("in.lat"),
             col("in.lon")
         )
@@ -192,21 +189,20 @@ def process_dim_location(sensordata_sdf: DataFrame, dim_location: DataFrame,
     # Using a left_outer join
     # Identify rows that EXISTS in landing data that does NOT EXISTS in existing Dimension table
     newrows_sdf = sensordata_sdf.alias("in")\
-        .join(dim_location, ["lat", "lon", "location"], "left_outer")\
+        .join(dim_location, ["lat", "lon"], "left_outer")\
         .where(dim_location["lat"].isNull() & dim_location["lon"].isNull())\
         .select(col("in.*"))
 
     # Add load_id, loaded_at and dim_parking_bay_id
     existingrows_sdf = existingrows_sdf.withColumn("load_id", lit(load_id))\
-        .withColumn("loaded_on", lit(loaded_on.isoformat()))
+        .withColumn("loaded_on", lit(loaded_on.isoformat()).cast("timestamp"))
     newrows_sdf = newrows_sdf.withColumn("load_id", lit(load_id))\
-        .withColumn("loaded_on", lit(loaded_on.isoformat()))\
+        .withColumn("loaded_on", lit(loaded_on.isoformat()).cast("timestamp"))\
         .withColumn("dim_location_id", uuidUdf())
 
     # Select relevant columns
     relevant_cols = [
         "dim_location_id",
-        "location",
         "lat",
         "lon",
         "load_id",
@@ -255,9 +251,9 @@ def process_dim_st_marker(sensordata_sdf: DataFrame,
 
     # Add load_id, loaded_at and dim_parking_bay_id
     existingrows_sdf = existingrows_sdf.withColumn("load_id", lit(load_id))\
-        .withColumn("loaded_on", lit(loaded_on.isoformat()))
+        .withColumn("loaded_on", lit(loaded_on.isoformat()).cast("timestamp"))
     newrows_sdf = newrows_sdf.withColumn("load_id", lit(load_id))\
-        .withColumn("loaded_on", lit(loaded_on.isoformat()))\
+        .withColumn("loaded_on", lit(loaded_on.isoformat()).cast("timestamp"))\
         .withColumn("dim_st_marker_id", uuidUdf())
 
     # Select relevant columns
@@ -292,20 +288,20 @@ def process_fact_parking(sensordata_sdf: DataFrame,
     # Build fact
     fact_parking = sensordata_sdf\
         .join(dim_parkingbay_sdf.alias("pb"), "bay_id", "left_outer")\
-        .join(dim_location_sdf.alias("l"), ["lat", "lon", "location"], "left_outer")\
+        .join(dim_location_sdf.alias("l"), ["lat", "lon"], "left_outer")\
         .join(dim_st_marker_sdf.alias("st"), "st_marker_id", "left_outer")\
         .select(
             lit(dim_date_id).alias("dim_date_id"),
             lit(dim_time_id).alias("dim_time_id"),
-            when(col("pb.dim_parking_bay_id").isNull(), -1)
+            when(col("pb.dim_parking_bay_id").isNull(), lit(EMPTY_UUID))
             .otherwise(col("pb.dim_parking_bay_id")).alias("dim_parking_bay_id"),
-            when(col("l.dim_location_id").isNull(), -1)
+            when(col("l.dim_location_id").isNull(), lit(EMPTY_UUID))
             .otherwise(col("l.dim_location_id")).alias("dim_location_id"),
-            when(col("st.dim_st_marker_id").isNull(), -1)
+            when(col("st.dim_st_marker_id").isNull(), lit(EMPTY_UUID))
             .otherwise(col("st.dim_st_marker_id")).alias("dim_st_marker_id"),
             "status",
             lit(load_id).alias("load_id"),
-            lit(loaded_on.isoformat()).alias("loaded_on")
+            lit(loaded_on.isoformat()).cast("timestamp").alias("loaded_on")
         )
     return fact_parking
 
