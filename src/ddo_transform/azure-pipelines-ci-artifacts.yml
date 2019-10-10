@@ -14,7 +14,8 @@ variables:
   PACKAGE_MINOR_VERSION:  1
   PACKAGE_PATCH_VERSION:  $(Build.BuildId)
   SQL_DW_PATH: 'sql/ddo_azuresqldw_dw'
-  SQL_DW_SOLUTION: '$(SQL_DW_PATH)/ddo_azuresqldw_dw.sln'
+  SQL_DW_SOLUTION_NAME: 'ddo_azuresqldw_dw'
+  SQL_DW_SOLUTION: '$(SQL_DW_PATH)/$(SQL_DW_SOLUTION_NAME).sln'
   BUILD_PLATFORM: 'Any CPU'
   BUILD_CONFIGURATION: 'Release'
 
@@ -136,6 +137,6 @@ stages:
 
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(SQL_DW_PATH)/bin/$(BUILD_CONFIGURATION)/ddo_azuresqldw_dw.dacpac'
+        PathtoPublish: '$(SQL_DW_PATH)/$(SQL_DW_SOLUTION_NAME)/bin/$(BUILD_CONFIGURATION)/ddo_azuresqldw_dw.dacpac'
         ArtifactName: 'sql_dw_dacpac'
       displayName: 'Publish SQL DACPAC'
