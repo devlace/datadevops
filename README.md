@@ -155,7 +155,8 @@ ADLS Gen2 is structured as the following:
         /libs                   <- contains all libs, jars, wheels needed for processing
         /data
             /lnd                <- landing folder where all data files are ingested into.
-            /databricks_delta   <- final tables 
+            /interim            <- interim (cleanesed) tables
+            /dw                 <- final tables 
 
 
 ------------
