@@ -56,5 +56,39 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="Security\" />
+    <Folder Include="External Resources\" />
+    <Folder Include="ext\" />
+    <Folder Include="ext\External Tables\" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Security\ext.sql" />
+    <Build Include="External Resources\ParquetFileFormat.sql" />
+    <Build Include="ext\External Tables\dim_st_marker.sql">
+      <QuotedIdentifier>Off</QuotedIdentifier>
+    </Build>
+    <Build Include="dbo\Tables\fact_parking.sql" />
+    <Build Include="dbo\Tables\dim_st_marker.sql" />
+    <Build Include="dbo\Tables\dim_parking_bay.sql" />
+    <Build Include="dbo\Tables\dim_location.sql" />
+    <Build Include="ext\External Tables\dim_parking_bay.sql">
+      <QuotedIdentifier>Off</QuotedIdentifier>
+    </Build>
+    <Build Include="ext\External Tables\dim_location.sql">
+      <QuotedIdentifier>Off</QuotedIdentifier>
+    </Build>
+    <Build Include="dbo\Stored Procedures\load_dw.sql" />
+    <Build Include="ext\External Tables\fact_parking.sql">
+      <QuotedIdentifier>Off</QuotedIdentifier>
+    </Build>
+    <Build Include="External Resources\AzureDataLakeStorage.sql" />
+    <Build Include="Security\ADLSCredentialKey.sql" />
+    <Build Include="Security\MasterKeys.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Script.PostDeployment1.sql" />
   </ItemGroup>
 </Project>
