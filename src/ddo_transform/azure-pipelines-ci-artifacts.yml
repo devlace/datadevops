@@ -13,6 +13,9 @@ variables:
   PACKAGE_MAJOR_VERSION:  1
   PACKAGE_MINOR_VERSION:  1
   PACKAGE_PATCH_VERSION:  $(Build.BuildId)
+  SQL_DW_SOLUTION: 'sql/ddo_azuresqldw_dw/ddo_azuresqldw_dw.sln'
+  BUILD_PLATFORM: 'Any CPU'
+  BUILD_CONFIGURATION: 'Release'
 
 stages:
 - stage: 'validate_pr'
@@ -40,6 +43,26 @@ stages:
     - script: make test && make lint
       workingDirectory: $(WORKING_DIR)
       displayName: 'Run lint tests'
+  - job: 'validate_python_packages'
+    displayName: 'Validate Python Packages'
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    steps:
+    - task: NuGetToolInstaller@1
+
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: '$(SQL_DW_SOLUTION)'
+
+    - task: VSBuild@1
+      inputs:
+        solution: '$(SQL_DW_SOLUTION)'
+        platform: '$(BUILD_PLATFORM)'
+        configuration: '$(BUILD_CONFIGURATION)'
+    - task: VSTest@2
+      inputs:
+        platform: '$(BUILD_PLATFORM)'
+        configuration: '$(BUILD_CONFIGURATION)'
 
 - stage: 'publish_artifacts'
   displayName: 'Publish Build Artifacts'
