@@ -13,7 +13,9 @@ variables:
   PACKAGE_MAJOR_VERSION:  1
   PACKAGE_MINOR_VERSION:  1
   PACKAGE_PATCH_VERSION:  $(Build.BuildId)
-  SQL_DW_SOLUTION: 'sql/ddo_azuresqldw_dw/ddo_azuresqldw_dw.sln'
+  SQL_DW_PATH: 'sql/ddo_azuresqldw_dw'
+  SQL_DW_SOLUTION_NAME: 'ddo_azuresqldw_dw'
+  SQL_DW_SOLUTION: '$(SQL_DW_PATH)/$(SQL_DW_SOLUTION_NAME).sln'
   BUILD_PLATFORM: 'Any CPU'
   BUILD_CONFIGURATION: 'Release'
 
@@ -111,3 +113,30 @@ stages:
         PathtoPublish: 'adf/_scripts/deploymentadf.ps1'
         ArtifactName: 'adf_scripts'
       displayName: 'Publish ADF Scripts'
+
+  - job: 'publish_sql_packages'
+    displayName: 'Publish SQL Packages'
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: NuGetToolInstaller@1
+
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: '$(SQL_DW_SOLUTION)'
+
+    - task: VSBuild@1
+      inputs:
+        solution: '$(SQL_DW_SOLUTION)'
+        platform: '$(BUILD_PLATFORM)'
+        configuration: '$(BUILD_CONFIGURATION)'
+    - task: VSTest@2
+      inputs:
+        platform: '$(BUILD_PLATFORM)'
+        configuration: '$(BUILD_CONFIGURATION)'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(SQL_DW_PATH)/$(SQL_DW_SOLUTION_NAME)/bin/$(BUILD_CONFIGURATION)/ddo_azuresqldw_dw.dacpac'
+        ArtifactName: 'sql_dw_dacpac'
+      displayName: 'Publish SQL DACPAC'
