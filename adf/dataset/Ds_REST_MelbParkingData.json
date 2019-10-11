@@ -10,6 +10,7 @@
 				"type": "String"
 			}
 		},
+		"annotations": [],
 		"type": "RestResource",
 		"typeProperties": {
 			"relativeUrl": {
