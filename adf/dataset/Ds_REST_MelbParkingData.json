@@ -1,0 +1,22 @@
+{
+	"name": "Ds_REST_MelbParkingData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ls_Rest_MelParkSensors",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"relativeurl": {
+				"type": "String"
+			}
+		},
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().relativeurl",
+				"type": "Expression"
+			},
+			"requestMethod": "GET"
+		}
+	}
+}
