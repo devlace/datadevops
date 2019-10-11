@@ -27,6 +27,7 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
+				"userProperties": [],
 				"typeProperties": {
 					"notebookPath": "/notebooks/02_standardize",
 					"baseParameters": {
@@ -41,7 +42,7 @@
 					},
 					"libraries": [
 						{
-							"egg": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+							"egg": "dbfs:/mnt/datalake/libs/ddo_transform-1.0.0-py2.py3-none-any.whl"
 						}
 					]
 				},
@@ -53,6 +54,8 @@
 			{
 				"name": "Set infilefolder",
 				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
 				"typeProperties": {
 					"variableName": "infilefolder",
 					"value": {
@@ -79,6 +82,7 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
+				"userProperties": [],
 				"typeProperties": {
 					"source": {
 						"type": "RestSource",
@@ -132,6 +136,7 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
+				"userProperties": [],
 				"typeProperties": {
 					"source": {
 						"type": "RestSource",
@@ -168,7 +173,7 @@
 				]
 			},
 			{
-				"name": "TransformLoad_DatabricksDelta",
+				"name": "TransformData",
 				"type": "DatabricksNotebook",
 				"dependsOn": [
 					{
@@ -185,6 +190,7 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
+				"userProperties": [],
 				"typeProperties": {
 					"notebookPath": "/notebooks/03_transform",
 					"baseParameters": {
@@ -195,12 +201,48 @@
 					},
 					"libraries": [
 						{
-							"egg": "dbfs:/mnt/datalake/libs/ddo_transform-1.0-py2.py3-none-any.whl"
+							"egg": "dbfs:/mnt/datalake/libs/ddo_transform-1.0.0-py2.py3-none-any.whl"
 						}
 					]
 				},
 				"linkedServiceName": {
 					"referenceName": "Ls_adb_01",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Load SQLDW",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "TransformData",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[load_dw]",
+					"storedProcedureParameters": {
+						"load_id": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "Ls_AzureSQLDW_01",
 					"type": "LinkedServiceReference"
 				}
 			}
@@ -210,6 +252,7 @@
 				"type": "String",
 				"defaultValue": "lnd"
 			}
-		}
+		},
+		"annotations": []
 	}
 }
