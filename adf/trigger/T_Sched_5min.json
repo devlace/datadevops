@@ -1,0 +1,23 @@
+{
+	"name": "T_Sched_5min",
+	"properties": {
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "P_Ingest_MelbParkingData",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 5,
+				"startTime": "2019-02-01T05:28:00.000Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}
