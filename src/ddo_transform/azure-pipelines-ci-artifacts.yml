@@ -22,7 +22,7 @@ variables:
 stages:
 - stage: 'validate_pr'
   displayName: 'Validate PR'
-  # condition: and(always(), eq(variables['Build.Reason'], 'PullRequest'))
+  condition: and(always(), eq(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - job: 'validate_python_packages'
     displayName: 'Validate Python Packages'
