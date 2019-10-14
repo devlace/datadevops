@@ -38,13 +38,13 @@ stages:
       workingDirectory: $(WORKING_DIR)
       displayName: 'Install requirements'
 
-    - script: make lint && make tests 
+    - script: make lint 
       workingDirectory: $(WORKING_DIR)
-      displayName: 'Run lint tests'
+      displayName: 'Run lint'
 
-    - script: make test && make lint
+    - script: make test
       workingDirectory: $(WORKING_DIR)
-      displayName: 'Run lint tests'
+      displayName: 'Run tests'
 
   - job: 'validate_sql_packages'
     displayName: 'Validate SQL Packages'
