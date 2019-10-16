@@ -1,26 +1,23 @@
 # Databricks notebook source
-dbutils.widgets.text("infilefolder", "", "In - Folder Path")
-infilefolder = dbutils.widgets.get("infilefolder")
-
 dbutils.widgets.text("loadid", "", "Load Id")
 loadid = dbutils.widgets.get("loadid")
 
 # COMMAND ----------
 
-import datetime
-import os
-
-# For testing
-# infilefolder = 'datalake/data/lnd/2019_03_11_01_38_00/'
-load_id = loadid
-loaded_on = datetime.datetime.now()
-base_path = 'dbfs:/mnt/datalake/data/dw/'
+from applicationinsights import TelemetryClient
+tc = TelemetryClient(dbutils.secrets.get(scope = "storage_scope", key = "appinsights_key"))
 
 # COMMAND ----------
 
+import datetime
+import os
 from pyspark.sql.functions import col, lit
 import ddo_transform.transform as t
 import ddo_transform.util as util
+
+load_id = loadid
+loaded_on = datetime.datetime.now()
+base_path = 'dbfs:/mnt/datalake/data/dw/'
 
 # Read interim cleansed data
 parkingbay_sdf = spark.read.table("interim.parking_bay").filter(col('load_id') == lit(load_id))
@@ -48,13 +45,6 @@ util.save_overwrite_unmanaged_table(spark, new_dim_parkingbay_sdf, table_name="d
 util.save_overwrite_unmanaged_table(spark, new_dim_location_sdf, table_name="dw.dim_location", path=os.path.join(base_path, "dim_location"))
 util.save_overwrite_unmanaged_table(spark, new_dim_st_marker_sdf, table_name="dw.dim_st_marker", path=os.path.join(base_path, "dim_st_marker"))
 
-# new_dim_parkingbay_sdf.write.mode("overwrite").saveAsTable("dw.dim_parking_bay_temp")
-# new_dim_location_sdf.write.mode("overwrite").saveAsTable("dw.dim_location_temp")
-# new_dim_st_marker_sdf.write.mode("overwrite").saveAsTable("dw.dim_st_marker_temp")
-# spark.read.table("dw.dim_parking_bay_temp").write.mode("overwrite").option("path", os.path.join(base_path, "dim_parking_bay")).saveAsTable("dw.dim_parking_bay")
-# spark.read.table("dw.dim_location_temp").write.mode("overwrite").option("path", os.path.join(base_path, "dim_location")).saveAsTable("dw.dim_location")
-# spark.read.table("dw.dim_st_marker_temp").write.mode("overwrite").option("path", os.path.join(base_path, "dim_st_marker")).saveAsTable("dw.dim_st_marker")
-
 # COMMAND ----------
 
 # MAGIC %md
@@ -72,6 +62,28 @@ nr_fact_parking = t.process_fact_parking(sensordata_sdf, dim_parkingbay_sdf, dim
 
 # Insert new rows
 nr_fact_parking.write.mode("append").insertInto("dw.fact_parking")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Metrics
+
+# COMMAND ----------
+
+new_dim_parkingbay_count = new_dim_parkingbay_sdf.count()
+new_dim_location_count = new_dim_location_sdf.count()
+new_dim_st_marker_count = new_dim_st_marker_sdf.count()
+nr_fact_parking_count = nr_fact_parking.count()
+
+
+tc.track_event('Transform : Completed load', 
+               properties={'load_id': load_id},
+               measurements={'new_dim_parkingbay_count': new_dim_parkingbay_count,
+                             'new_dim_location_count': new_dim_location_count,
+                             'new_dim_st_marker_count': new_dim_st_marker_count,
+                             'nr_fact_parking_count': nr_fact_parking_count
+                            })
+tc.flush()
 
 # COMMAND ----------
 
