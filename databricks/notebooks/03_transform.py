@@ -70,9 +70,9 @@ nr_fact_parking.write.mode("append").insertInto("dw.fact_parking")
 
 # COMMAND ----------
 
-new_dim_parkingbay_count = new_dim_parkingbay_sdf.count()
-new_dim_location_count = new_dim_location_sdf.count()
-new_dim_st_marker_count = new_dim_st_marker_sdf.count()
+new_dim_parkingbay_count = spark.read.table("dw.dim_parking_bay").count()
+new_dim_location_count = spark.read.table("dw.dim_location").count()
+new_dim_st_marker_count = spark.read.table("dw.dim_st_marker").count()
 nr_fact_parking_count = nr_fact_parking.count()
 
 
@@ -81,7 +81,7 @@ tc.track_event('Transform : Completed load',
                measurements={'new_dim_parkingbay_count': new_dim_parkingbay_count,
                              'new_dim_location_count': new_dim_location_count,
                              'new_dim_st_marker_count': new_dim_st_marker_count,
-                             'nr_fact_parking_count': nr_fact_parking_count
+                             'newrecords_fact_parking_count': nr_fact_parking_count
                             })
 tc.flush()
 
