@@ -7,6 +7,11 @@ loadid = dbutils.widgets.get("loadid")
 
 # COMMAND ----------
 
+from applicationinsights import TelemetryClient
+tc = TelemetryClient(dbutils.secrets.get(scope = "storage_scope", key = "appinsights_key"))
+
+# COMMAND ----------
+
 import os
 import datetime
 
@@ -55,4 +60,28 @@ t_sensordata_malformed_sdf.write.mode("append").insertInto("malformed.sensor")
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ### Metrics
 
+# COMMAND ----------
+
+parkingbay_count = t_parkingbay_sdf.count()
+sensordata_count = t_sensordata_sdf.count()
+parkingbay_malformed_count = t_parkingbay_malformed_sdf.count()
+sensordata_malformed_count = t_sensordata_malformed_sdf.count()
+
+tc.track_event('Standardize : Completed load', 
+               properties={'parkingbay_filepath': parkingbay_filepath, 
+                           'sensors_filepath': sensors_filepath,
+                           'load_id': load_id 
+                          },
+               measurements={'parkingbay_count': parkingbay_count,
+                             'sensordata_count': sensordata_count,
+                             'parkingbay_malformed_count': parkingbay_malformed_count,
+                             'sensordata_malformed_count': sensordata_malformed_count
+                            })
+tc.flush()
+
+# COMMAND ----------
+
+dbutils.notebook.exit("success")
