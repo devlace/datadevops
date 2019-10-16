@@ -1,7 +1,6 @@
 {
 	"name": "P_Ingest_MelbParkingData",
 	"properties": {
-		"description": "Hello girls geek sydeny",
 		"activities": [
 			{
 				"name": "StandardizeData",
