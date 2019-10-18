@@ -1,7 +1,6 @@
 {
 	"name": "P_Ingest_MelbParkingData",
 	"properties": {
-		"description": "Test",
 		"activities": [
 			{
 				"name": "StandardizeData",
