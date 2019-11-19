@@ -4,6 +4,8 @@
 
 The purpose of this repository is to demonstrate how DevOps principles can be applied Data Pipeline Solution. 
 
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Xs1-OU5cmsw/0.jpg)](https://www.youtube.com/watch?v=Xs1-OU5cmsw")
+
 ## Architecture
 
 The following shows the overall architecture of the solution.
