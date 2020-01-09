@@ -1,4 +1,9 @@
-[![Build Status](https://dev.azure.com/devlacepub/DataDevOps/_apis/build/status/ddo_transform-ci-artifacts?branchName=master)](https://dev.azure.com/devlacepub/DataDevOps/_build/latest?definitionId=3&branchName=master)
+# We've moved!
+
+This repository has moved under the official Azure Samples Github organization: 
+https://github.com/Azure-Samples/modern-data-warehouse-dataops
+
+-------------------
 
 # DataDevOps
 
