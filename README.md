@@ -1,7 +1,9 @@
 # We've moved!
 
-This repository has moved under the official Azure Samples Github organization: 
-https://github.com/Azure-Samples/modern-data-warehouse-dataops
+<span style="color:#8b0000; font-weight: bold;">This repository has moved under the official Azure Samples Github organization: </span>.
+
+**https://github.com/Azure-Samples/modern-data-warehouse-dataops**
+
 
 -------------------
 
